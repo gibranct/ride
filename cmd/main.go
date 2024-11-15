@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"regexp"
-	"time"
 
 	uuid "github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/labstack/echo/v4"
 )
 
 const PORT = "127.0.0.1:3333"
@@ -27,37 +26,20 @@ type Account struct {
 }
 
 func main() {
-	mux := http.NewServeMux()
+	e := echo.New()
 
-	mux.HandleFunc("POST /sign-up", SignUp)
+	e.POST("/sign-up", SignUp)
 
-	server := http.Server{
-		Addr:         PORT,
-		ReadTimeout:  3 * time.Second,
-		WriteTimeout: 3 * time.Second,
-		Handler:      mux,
-	}
-
-	fmt.Printf("Server listening on port %s...\n", PORT)
-
-	err := server.ListenAndServe()
-
-	if err != nil {
-		println(err.Error())
-		os.Exit(1)
-	}
+	e.Logger.Fatal(e.Start(PORT))
 }
 
-func SignUp(w http.ResponseWriter, req *http.Request) {
+func SignUp(c echo.Context) error {
 	saveQuery := "insert into gct.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)"
 	var input Account
 
-	dec := json.NewDecoder(req.Body)
-	err := dec.Decode(&input)
-
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	if err := c.Bind(&input); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return err
 	}
 
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
@@ -75,84 +57,45 @@ func SignUp(w http.ResponseWriter, req *http.Request) {
 		&account.ID, &account.Email,
 	)
 
-	if account.ID == "" {
-		matchName := regexp.MustCompile("[a-zA-Z] [a-zA-Z]+").MatchString(input.Name)
-		matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(input.Email)
-		matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(input.CarPlate)
-		if matchName {
-			if matchEmail {
-				if validateCPF(input.CPF) {
-					if input.IsDriver {
-						if matchCarPlate {
-							args := []any{
-								id, input.Name, input.Email, input.CPF, input.CarPlate, input.IsPassenger, input.IsDriver, input.Password,
-							}
-							conn.Exec(context.Background(), saveQuery, args...)
-							obj := struct {
-								AccountId string `json:"accountId"`
-							}{
-								AccountId: id,
-							}
-							result = obj
-						} else {
-							result = -5
-						}
-					} else {
-						args := []any{
-							id, input.Name, input.Email, input.CPF, input.CarPlate, input.IsPassenger, input.IsDriver, input.Password,
-						}
-						conn.Exec(context.Background(), saveQuery, args...)
-						obj := struct {
-							AccountId string `json:"accountId"`
-						}{
-							AccountId: id,
-						}
-						result = obj
-					}
-				} else {
-					// invalid cpf
-					result = -1
-				}
-			} else {
-				// invalid email
-				result = -2
-			}
-
-		} else {
-			// invalid name
-			result = -3
-		}
-	} else {
-		// already exists
-		result = -4
+	if account.ID != "" {
+		response := map[string]any{"message": -4}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
+	matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(input.CarPlate)
 
-	if _, ok := result.(int); ok {
-		w.WriteHeader(http.StatusUnprocessableEntity)
-
-		err = json.NewEncoder(w).Encode(
-			map[string]any{
-				"message": result,
-			},
-		)
-
-		if err != nil {
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-
-		return
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		err = json.NewEncoder(w).Encode(result)
-
-		if err != nil {
-			fmt.Println(err.Error())
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-
-		return
+	matchName := regexp.MustCompile("[a-zA-Z] [a-zA-Z]+").MatchString(input.Name)
+	if !matchName {
+		response := map[string]any{"message": -3}
+		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
+
+	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(input.Email)
+	if !matchEmail {
+		response := map[string]any{"message": -2}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if !validateCPF(input.CPF) {
+		response := map[string]any{"message": -1}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	if input.IsDriver && !matchCarPlate {
+		response := map[string]any{"message": -5}
+		return c.JSON(http.StatusUnprocessableEntity, response)
+	}
+
+	args := []any{
+		id, input.Name, input.Email, input.CPF, input.CarPlate, input.IsPassenger, input.IsDriver, input.Password,
+	}
+	conn.Exec(context.Background(), saveQuery, args...)
+	obj := struct {
+		AccountId string `json:"accountId"`
+	}{
+		AccountId: id,
+	}
+	result = obj
+
+	return c.JSON(http.StatusCreated, result)
 }
