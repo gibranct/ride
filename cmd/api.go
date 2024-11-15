@@ -37,9 +37,10 @@ func SignUpHandler(c echo.Context) error {
 }
 
 func GetAccountByIDHandler(c echo.Context) error {
+	accountDAO := NewAccountDAO()
 	accountId := c.Param("id")
 
-	account, err := GetAccountByID(accountId)
+	account, err := accountDAO.GetAccountByID(accountId)
 
 	if err != nil {
 		return err
