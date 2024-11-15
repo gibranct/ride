@@ -37,7 +37,7 @@ func Test_SignUpDriver(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -47,7 +47,7 @@ func Test_SignUpDriver(t *testing.T) {
 
 func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 	type SignUpOutput struct {
-		Message int `json:"message"`
+		Message string `json:"message"`
 	}
 	signUpJson := Account{
 		Name:        "John Doe",
@@ -68,11 +68,11 @@ func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, -5)
+		assert.Equal(t, responseBody.Message, "invalid car plate")
 	}
 }
 
@@ -99,7 +99,7 @@ func Test_SignUpPassenger(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -109,7 +109,7 @@ func Test_SignUpPassenger(t *testing.T) {
 
 func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 	type SignUpOutput struct {
-		Message int `json:"message"`
+		Message string `json:"message"`
 	}
 	signUpJson := Account{
 		Name:        "John Doe",
@@ -130,17 +130,17 @@ func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, -1)
+		assert.Equal(t, responseBody.Message, "invalid cpf")
 	}
 }
 
 func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 	type SignUpOutput struct {
-		Message int `json:"message"`
+		Message string `json:"message"`
 	}
 	signUpJson := Account{
 		Name:        "John Doe",
@@ -161,17 +161,17 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, -2)
+		assert.Equal(t, responseBody.Message, "invalid email")
 	}
 }
 
 func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 	type SignUpOutput struct {
-		Message int `json:"message"`
+		Message string `json:"message"`
 	}
 	signUpJson := Account{
 		Name:        "John",
@@ -192,17 +192,17 @@ func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, -3)
+		assert.Equal(t, responseBody.Message, "invalid name")
 	}
 }
 
 func Test_SignUpDuplicatedPassenger(t *testing.T) {
 	type SignUpOutput struct {
-		Message int `json:"message"`
+		Message string `json:"message"`
 	}
 	signUpJson := Account{
 		Name:        "John Doe",
@@ -222,18 +222,18 @@ func Test_SignUpDuplicatedPassenger(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
-	SignUp(ctx)
+	SignUpHandler(ctx)
 
 	req = httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec = httptest.NewRecorder()
 	ctx = e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUp(ctx)) {
+	if assert.NoError(t, SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, -4)
+		assert.Equal(t, responseBody.Message, "duplicated account")
 	}
 }
 
@@ -245,7 +245,7 @@ func Test_SignUpWithInvalidJSON(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.Error(t, SignUp(ctx)) {
+	if assert.Error(t, SignUpHandler(ctx)) {
 		assert.Equal(t, http.StatusBadRequest, rec.Code)
 	}
 }
