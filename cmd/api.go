@@ -13,6 +13,8 @@ func StartServer() {
 
 	e.POST("/sign-up", SignUpHandler)
 
+	e.GET("/v1/accounts/:id", GetAccountByIDHandler)
+
 	e.Logger.Fatal(e.Start(PORT))
 }
 
@@ -32,4 +34,16 @@ func SignUpHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusCreated, output)
+}
+
+func GetAccountByIDHandler(c echo.Context) error {
+	accountId := c.Param("id")
+
+	account, err := GetAccountByID(accountId)
+
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, account)
 }

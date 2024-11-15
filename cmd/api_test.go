@@ -14,11 +14,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_SignUpDriver(t *testing.T) {
+func Test_SignUpDriverAPI(t *testing.T) {
 	type SignUpOutput struct {
 		AccountId string `json:"accountId"`
 	}
-	signUpJson := Account{
+	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -27,11 +27,13 @@ func Test_SignUpDriver(t *testing.T) {
 		IsDriver:    true,
 		Password:    "secret",
 	}
-	jsonBytes, _ := json.Marshal(signUpJson)
+	jsonBytes, _ := json.Marshal(account)
 	var responseBody SignUpOutput
+	var newAccount Account
 
 	e := echo.New()
 
+	// Sign up
 	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
@@ -43,102 +45,32 @@ func Test_SignUpDriver(t *testing.T) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 		assert.NotEmpty(t, responseBody.AccountId)
 	}
-}
 
-func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
-	type SignUpOutput struct {
-		Message string `json:"message"`
-	}
-	signUpJson := Account{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA123",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret",
-	}
-	jsonBytes, _ := json.Marshal(signUpJson)
-	var responseBody SignUpOutput
+	// GetAccount
+	path := "/v1/accounts/:id"
+	req = httptest.NewRequest(http.MethodGet, path, nil)
+	req.Header.Set(echo.HeaderAcceptEncoding, echo.MIMEApplicationJSON)
+	rec = httptest.NewRecorder()
+	ctx = e.NewContext(req, rec)
+	ctx.SetPath(path)
+	ctx.SetParamNames("id")
+	ctx.SetParamValues(responseBody.AccountId)
 
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	ctx := e.NewContext(req, rec)
-
-	if assert.NoError(t, SignUpHandler(ctx)) {
-		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
+	if assert.NoError(t, GetAccountByIDHandler(ctx)) {
+		err := json.Unmarshal(rec.Body.Bytes(), &newAccount)
 		assert.NoError(t, err)
-		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, "invalid car plate")
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, responseBody.AccountId, newAccount.ID)
+		assert.Equal(t, account.Name, newAccount.Name)
+		assert.Equal(t, account.Email, newAccount.Email)
+		assert.Equal(t, account.CPF, newAccount.CPF)
+		assert.Equal(t, account.IsDriver, newAccount.IsDriver)
+		assert.Equal(t, account.IsPassenger, newAccount.IsPassenger)
+		assert.Equal(t, account.CarPlate, newAccount.CarPlate)
 	}
 }
 
-func Test_SignUpPassenger(t *testing.T) {
-	type SignUpOutput struct {
-		AccountId string `json:"accountId"`
-	}
-	signUpJson := Account{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: true,
-		IsDriver:    false,
-		Password:    "secret",
-	}
-	jsonBytes, _ := json.Marshal(signUpJson)
-	var responseBody SignUpOutput
-
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	ctx := e.NewContext(req, rec)
-
-	if assert.NoError(t, SignUpHandler(ctx)) {
-		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
-		assert.NoError(t, err)
-		assert.Equal(t, http.StatusCreated, rec.Code)
-		assert.NotEmpty(t, responseBody.AccountId)
-	}
-}
-
-func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
-	type SignUpOutput struct {
-		Message string `json:"message"`
-	}
-	signUpJson := Account{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "9745632155",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret",
-	}
-	jsonBytes, _ := json.Marshal(signUpJson)
-	var responseBody SignUpOutput
-
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	ctx := e.NewContext(req, rec)
-
-	if assert.NoError(t, SignUpHandler(ctx)) {
-		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
-		assert.NoError(t, err)
-		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, "invalid cpf")
-	}
-}
-
-func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
+func Test_SignUpPassengerWithInvalidEmailAPI(t *testing.T) {
 	type SignUpOutput struct {
 		Message string `json:"message"`
 	}
@@ -166,74 +98,6 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
 		assert.Equal(t, responseBody.Message, "invalid email")
-	}
-}
-
-func Test_SignUpPassengerWithInvalidName(t *testing.T) {
-	type SignUpOutput struct {
-		Message string `json:"message"`
-	}
-	signUpJson := Account{
-		Name:        "John",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret",
-	}
-	jsonBytes, _ := json.Marshal(signUpJson)
-	var responseBody SignUpOutput
-
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	ctx := e.NewContext(req, rec)
-
-	if assert.NoError(t, SignUpHandler(ctx)) {
-		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
-		assert.NoError(t, err)
-		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, "invalid name")
-	}
-}
-
-func Test_SignUpDuplicatedPassenger(t *testing.T) {
-	type SignUpOutput struct {
-		Message string `json:"message"`
-	}
-	signUpJson := Account{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret",
-	}
-	jsonBytes, _ := json.Marshal(signUpJson)
-	var responseBody SignUpOutput
-
-	e := echo.New()
-
-	req := httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec := httptest.NewRecorder()
-	ctx := e.NewContext(req, rec)
-	SignUpHandler(ctx)
-
-	req = httptest.NewRequest(http.MethodPost, "/sign-up", bytes.NewBuffer(jsonBytes))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	rec = httptest.NewRecorder()
-	ctx = e.NewContext(req, rec)
-
-	if assert.NoError(t, SignUpHandler(ctx)) {
-		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
-		assert.NoError(t, err)
-		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
-		assert.Equal(t, responseBody.Message, "duplicated account")
 	}
 }
 
