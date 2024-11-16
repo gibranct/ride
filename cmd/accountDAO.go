@@ -8,9 +8,15 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-type AccountDAO struct{}
+type AccountDAO interface {
+	GetAccountByEmail(email string) (*Account, error)
+	GetAccountByID(id string) (*Account, error)
+	SaveAccount(account Account) error
+}
 
-func (dao AccountDAO) GetAccountByEmail(email string) (*Account, error) {
+type AccountDAODatabase struct{}
+
+func (dao AccountDAODatabase) GetAccountByEmail(email string) (*Account, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
@@ -26,7 +32,7 @@ func (dao AccountDAO) GetAccountByEmail(email string) (*Account, error) {
 	return &account, nil
 }
 
-func (dao AccountDAO) GetAccountByID(id string) (*Account, error) {
+func (dao AccountDAODatabase) GetAccountByID(id string) (*Account, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
@@ -42,7 +48,7 @@ func (dao AccountDAO) GetAccountByID(id string) (*Account, error) {
 	return &account, nil
 }
 
-func (dao AccountDAO) SaveAccount(account Account) error {
+func (dao AccountDAODatabase) SaveAccount(account Account) error {
 	saveQuery := "insert into gct.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)"
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
@@ -58,6 +64,6 @@ func (dao AccountDAO) SaveAccount(account Account) error {
 	return err
 }
 
-func NewAccountDAO() *AccountDAO {
-	return &AccountDAO{}
+func NewAccountDAO() AccountDAO {
+	return &AccountDAODatabase{}
 }

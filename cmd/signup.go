@@ -7,15 +7,18 @@ import (
 	uuid "github.com/google/uuid"
 )
 
+type SignUp struct {
+	accountDAO AccountDAO
+}
+
 type SignUpOutput struct {
 	AccountId string `json:"accountId"`
 }
 
-func SignUp(input Account) (*SignUpOutput, error) {
-	accountDAO := NewAccountDAO()
+func (signUp *SignUp) Execute(input Account) (*SignUpOutput, error) {
 	input.ID = uuid.NewString()
 
-	account, err := accountDAO.GetAccountByEmail(input.Email)
+	account, err := signUp.accountDAO.GetAccountByEmail(input.Email)
 
 	if err != nil {
 		return nil, err
@@ -44,7 +47,7 @@ func SignUp(input Account) (*SignUpOutput, error) {
 		return nil, fmt.Errorf("invalid car plate")
 	}
 
-	err = accountDAO.SaveAccount(input)
+	err = signUp.accountDAO.SaveAccount(input)
 
 	if err != nil {
 		return nil, err
@@ -53,4 +56,10 @@ func SignUp(input Account) (*SignUpOutput, error) {
 	return &SignUpOutput{
 		AccountId: input.ID,
 	}, nil
+}
+
+func NewSignUpUseCase(accountDAO AccountDAO) *SignUp {
+	return &SignUp{
+		accountDAO: accountDAO,
+	}
 }

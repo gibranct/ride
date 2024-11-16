@@ -9,6 +9,7 @@ import (
 )
 
 func Test_SignUpDriver(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -18,7 +19,7 @@ func Test_SignUpDriver(t *testing.T) {
 		IsDriver:    true,
 		Password:    "secret",
 	}
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.NoError(t, err) {
 		assert.NotEmpty(t, output.AccountId)
@@ -26,6 +27,7 @@ func Test_SignUpDriver(t *testing.T) {
 }
 
 func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -36,7 +38,7 @@ func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 		Password:    "secret",
 	}
 
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.Nil(t, output) {
 		assert.Equal(t, err.Error(), "invalid car plate")
@@ -44,6 +46,7 @@ func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 }
 
 func Test_SignUpPassenger(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -54,7 +57,7 @@ func Test_SignUpPassenger(t *testing.T) {
 		Password:    "secret",
 	}
 
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.NoError(t, err) {
 		assert.NotEmpty(t, output.AccountId)
@@ -62,6 +65,7 @@ func Test_SignUpPassenger(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -72,7 +76,7 @@ func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 		Password:    "secret",
 	}
 
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.Error(t, err) {
 		assert.Nil(t, output)
@@ -81,6 +85,7 @@ func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
@@ -91,7 +96,7 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 		Password:    "secret",
 	}
 
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.Error(t, err) {
 		assert.Nil(t, output)
@@ -100,6 +105,7 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidName(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -110,7 +116,7 @@ func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 		Password:    "secret",
 	}
 
-	output, err := SignUp(account)
+	output, err := signUp.Execute(account)
 
 	if assert.Error(t, err) {
 		assert.Nil(t, output)
@@ -119,6 +125,7 @@ func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 }
 
 func Test_SignUpDuplicatedPassenger(t *testing.T) {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	account := Account{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -129,8 +136,8 @@ func Test_SignUpDuplicatedPassenger(t *testing.T) {
 		Password:    "secret",
 	}
 
-	SignUp(account)
-	output, err := SignUp(account)
+	signUp.Execute(account)
+	output, err := signUp.Execute(account)
 
 	if assert.Error(t, err) {
 		assert.Nil(t, output)

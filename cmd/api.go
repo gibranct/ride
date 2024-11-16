@@ -19,6 +19,7 @@ func StartServer() {
 }
 
 func SignUpHandler(c echo.Context) error {
+	signUp := NewSignUpUseCase(NewAccountDAO())
 	var input Account
 
 	if err := c.Bind(&input); err != nil {
@@ -26,7 +27,7 @@ func SignUpHandler(c echo.Context) error {
 		return err
 	}
 
-	output, err := SignUp(input)
+	output, err := signUp.Execute(input)
 
 	if err != nil {
 		response := map[string]any{"message": err.Error()}
@@ -37,10 +38,10 @@ func SignUpHandler(c echo.Context) error {
 }
 
 func GetAccountByIDHandler(c echo.Context) error {
-	accountDAO := NewAccountDAO()
+	getAccount := NewGetAccountCase(NewAccountDAO())
 	accountId := c.Param("id")
 
-	account, err := accountDAO.GetAccountByID(accountId)
+	account, err := getAccount.Execute(accountId)
 
 	if err != nil {
 		return err
