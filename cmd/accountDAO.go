@@ -15,6 +15,9 @@ type AccountDAO interface {
 }
 
 type AccountDAODatabase struct{}
+type AccountDAOMemory struct {
+	accounts []Account
+}
 
 func (dao AccountDAODatabase) GetAccountByEmail(email string) (*Account, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
@@ -66,4 +69,33 @@ func (dao AccountDAODatabase) SaveAccount(account Account) error {
 
 func NewAccountDAO() AccountDAO {
 	return &AccountDAODatabase{}
+}
+
+func (dao *AccountDAOMemory) GetAccountByEmail(email string) (*Account, error) {
+	for i := range dao.accounts {
+		if dao.accounts[i].Email == email {
+			return &dao.accounts[i], nil
+		}
+	}
+
+	return &Account{}, nil
+}
+
+func (dao *AccountDAOMemory) GetAccountByID(id string) (*Account, error) {
+	for i := range dao.accounts {
+		if dao.accounts[i].ID == id {
+			return &dao.accounts[i], nil
+		}
+	}
+
+	return &Account{}, nil
+}
+
+func (dao *AccountDAOMemory) SaveAccount(account Account) error {
+	dao.accounts = append(dao.accounts, account)
+	return nil
+}
+
+func NewAccountDAOMemory() AccountDAO {
+	return &AccountDAOMemory{}
 }
