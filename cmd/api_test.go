@@ -18,7 +18,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	type SignUpOutput struct {
 		AccountId string `json:"accountId"`
 	}
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -29,7 +29,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	}
 	jsonBytes, _ := json.Marshal(account)
 	var responseBody SignUpOutput
-	var newAccount Account
+	var newAccount GetAccountOutput
 
 	e := echo.New()
 
@@ -74,7 +74,7 @@ func Test_SignUpPassengerWithInvalidEmailAPI(t *testing.T) {
 	type SignUpOutput struct {
 		Message string `json:"message"`
 	}
-	signUpJson := Account{
+	signUpJson := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
 		CPF:         "97456321558",

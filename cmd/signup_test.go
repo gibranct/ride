@@ -10,7 +10,7 @@ import (
 
 func Test_SignUpDriver(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -28,7 +28,7 @@ func Test_SignUpDriver(t *testing.T) {
 
 func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -47,7 +47,7 @@ func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 
 func Test_SignUpPassenger(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -66,7 +66,7 @@ func Test_SignUpPassenger(t *testing.T) {
 
 func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "9745632155",
@@ -86,7 +86,7 @@ func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 
 func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -106,7 +106,7 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 
 func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -126,7 +126,7 @@ func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 
 func Test_SignUpDuplicatedPassenger(t *testing.T) {
 	signUp := NewSignUpUseCase(NewAccountDAOMemory())
-	account := Account{
+	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",

@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 	"regexp"
-
-	uuid "github.com/google/uuid"
 )
 
 type SignUp struct {
@@ -15,8 +13,25 @@ type SignUpOutput struct {
 	AccountId string `json:"accountId"`
 }
 
-func (signUp *SignUp) Execute(input Account) (*SignUpOutput, error) {
-	input.ID = uuid.NewString()
+type SignUpInput struct {
+	Name        string `json:"name"`
+	Email       string `json:"email"`
+	CPF         string `json:"cpf"`
+	CarPlate    string `json:"carPlate"`
+	IsPassenger bool   `json:"isPassenger"`
+	IsDriver    bool   `json:"isDriver"`
+	Password    string `json:"password"`
+}
+
+func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
+	newAccount, err := CreateAccount(
+		input.Name, input.Email, input.CPF, input.CarPlate,
+		input.Password, input.IsPassenger, input.IsDriver,
+	)
+
+	if err != nil {
+		return nil, err
+	}
 
 	account, err := signUp.accountDAO.GetAccountByEmail(input.Email)
 
@@ -28,33 +43,28 @@ func (signUp *SignUp) Execute(input Account) (*SignUpOutput, error) {
 		return nil, fmt.Errorf("duplicated account")
 	}
 
-	matchName := regexp.MustCompile("[a-zA-Z] [a-zA-Z]+").MatchString(input.Name)
-	if !matchName {
-		return nil, fmt.Errorf("invalid name")
-	}
-
-	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(input.Email)
+	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(newAccount.Email)
 	if !matchEmail {
 		return nil, fmt.Errorf("invalid email")
 	}
 
-	if !validateCPF(input.CPF) {
+	if !validateCPF(newAccount.CPF) {
 		return nil, fmt.Errorf("invalid cpf")
 	}
 
-	matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(input.CarPlate)
-	if input.IsDriver && !matchCarPlate {
+	matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(newAccount.CarPlate)
+	if newAccount.IsDriver && !matchCarPlate {
 		return nil, fmt.Errorf("invalid car plate")
 	}
 
-	err = signUp.accountDAO.SaveAccount(input)
+	err = signUp.accountDAO.SaveAccount(*newAccount)
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &SignUpOutput{
-		AccountId: input.ID,
+		AccountId: newAccount.ID,
 	}, nil
 }
 

@@ -20,7 +20,7 @@ func StartServer() {
 
 func SignUpHandler(c echo.Context) error {
 	signUp := NewSignUpUseCase(NewAccountDAO())
-	var input Account
+	var input SignUpInput
 
 	if err := c.Bind(&input); err != nil {
 		c.String(http.StatusBadRequest, err.Error())

@@ -43,12 +43,12 @@ func (dao AccountDAODatabase) GetAccountByID(id string) (*Account, error) {
 	}
 	defer conn.Close(context.Background())
 
-	var account Account
+	var account AccountDatabaseEntity
 	conn.QueryRow(context.Background(), "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where account_id = $1", id).Scan(
 		&account.ID, &account.Name, &account.Email, &account.CPF, &account.CarPlate, &account.IsPassenger, &account.IsDriver,
 	)
 
-	return &account, nil
+	return account.ToAccount()
 }
 
 func (dao AccountDAODatabase) SaveAccount(account Account) error {
@@ -60,7 +60,7 @@ func (dao AccountDAODatabase) SaveAccount(account Account) error {
 	}
 	defer conn.Close(context.Background())
 	args := []any{
-		account.ID, account.Name, account.Email, account.CPF, account.CarPlate, account.IsPassenger, account.IsDriver, account.Password,
+		account.ID, account.GetName(), account.Email, account.CPF, account.CarPlate, account.IsPassenger, account.IsDriver, account.Password,
 	}
 	_, err = conn.Exec(context.Background(), saveQuery, args...)
 
