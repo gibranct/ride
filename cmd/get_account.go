@@ -1,7 +1,7 @@
 package main
 
 type GetAccount struct {
-	accountDAO AccountDAO
+	accountDAO AccountRepository
 }
 
 type GetAccountOutput struct {
@@ -32,7 +32,7 @@ func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
 	}, nil
 }
 
-func NewGetAccountCase(accountDAO AccountDAO) *GetAccount {
+func NewGetAccountCase(accountDAO AccountRepository) *GetAccount {
 	return &GetAccount{
 		accountDAO: accountDAO,
 	}

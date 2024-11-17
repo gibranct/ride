@@ -5,7 +5,7 @@ import (
 )
 
 type SignUp struct {
-	accountDAO    AccountDAO
+	accountDAO    AccountRepository
 	mailerGateway MailerGateway
 }
 
@@ -56,7 +56,7 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 	}, nil
 }
 
-func NewSignUpUseCase(accountDAO AccountDAO, mailer MailerGateway) *SignUp {
+func NewSignUpUseCase(accountDAO AccountRepository, mailer MailerGateway) *SignUp {
 	return &SignUp{
 		accountDAO:    accountDAO,
 		mailerGateway: mailer,
