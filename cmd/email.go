@@ -9,7 +9,7 @@ type Email struct {
 	value string
 }
 
-func (e *Email) NewEmail(value string) (*Email, error) {
+func NewEmail(value string) (*Email, error) {
 	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(value)
 	if !matchEmail {
 		return nil, errors.New("invalid email")

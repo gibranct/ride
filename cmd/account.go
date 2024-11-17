@@ -3,18 +3,30 @@ package main
 import "github.com/google/uuid"
 
 type Account struct {
-	ID          string `json:"id"`
+	ID          string
 	name        *Name
-	Email       string `json:"email"`
-	CPF         string `json:"cpf"`
-	CarPlate    string `json:"carPlate"`
-	IsPassenger bool   `json:"isPassenger"`
-	IsDriver    bool   `json:"isDriver"`
-	Password    string `json:"password"`
+	email       *Email
+	cpf         *CPF
+	carPlate    *CarPlate
+	IsPassenger bool
+	IsDriver    bool
+	Password    string
 }
 
 func (a *Account) GetName() string {
 	return a.name.value
+}
+
+func (a *Account) GetEmail() string {
+	return a.email.value
+}
+
+func (a *Account) GetCPF() string {
+	return a.cpf.value
+}
+
+func (a *Account) GetCarPlate() string {
+	return a.carPlate.value
 }
 
 func NewAccount(
@@ -24,12 +36,24 @@ func NewAccount(
 	if err != nil {
 		return nil, err
 	}
+	newEmail, err := NewEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	newCPF, err := NewCPF(cpf)
+	if err != nil {
+		return nil, err
+	}
+	newCarPlate, err := NewCarPlate(carPlate)
+	if err != nil {
+		return nil, err
+	}
 	return &Account{
 		ID:          accountId,
 		name:        newName,
-		Email:       email,
-		CPF:         cpf,
-		CarPlate:    carPlate,
+		email:       newEmail,
+		cpf:         newCPF,
+		carPlate:    newCarPlate,
 		Password:    password,
 		IsPassenger: isPassenger,
 		IsDriver:    isDriver,

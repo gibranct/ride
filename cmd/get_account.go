@@ -24,9 +24,9 @@ func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
 	return &GetAccountOutput{
 		ID:          accountId,
 		Name:        account.GetName(),
-		Email:       account.Email,
-		CPF:         account.CPF,
-		CarPlate:    account.CarPlate,
+		Email:       account.GetEmail(),
+		CPF:         account.GetCPF(),
+		CarPlate:    account.GetCarPlate(),
 		IsPassenger: account.IsPassenger,
 		IsDriver:    account.IsDriver,
 	}, nil

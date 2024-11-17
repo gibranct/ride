@@ -27,12 +27,16 @@ func (dao AccountDAODatabase) GetAccountByEmail(email string) (*Account, error) 
 	}
 	defer conn.Close(context.Background())
 
-	account := Account{}
-	conn.QueryRow(context.Background(), "select account_id, email from gct.account where email = $1", email).Scan(
-		&account.ID, &account.Email,
+	account := AccountDatabaseEntity{}
+	conn.QueryRow(context.Background(), "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1", email).Scan(
+		&account.ID, &account.Name, &account.Email, &account.CPF, &account.CarPlate, &account.IsPassenger, &account.IsDriver,
 	)
 
-	return &account, nil
+	if account.ID == "" {
+		return &Account{}, nil
+	}
+
+	return account.ToAccount()
 }
 
 func (dao AccountDAODatabase) GetAccountByID(id string) (*Account, error) {
@@ -60,7 +64,7 @@ func (dao AccountDAODatabase) SaveAccount(account Account) error {
 	}
 	defer conn.Close(context.Background())
 	args := []any{
-		account.ID, account.GetName(), account.Email, account.CPF, account.CarPlate, account.IsPassenger, account.IsDriver, account.Password,
+		account.ID, account.GetName(), account.GetEmail(), account.GetCPF(), account.GetCarPlate(), account.IsPassenger, account.IsDriver, account.Password,
 	}
 	_, err = conn.Exec(context.Background(), saveQuery, args...)
 
@@ -73,7 +77,7 @@ func NewAccountDAO() AccountDAO {
 
 func (dao *AccountDAOMemory) GetAccountByEmail(email string) (*Account, error) {
 	for i := range dao.accounts {
-		if dao.accounts[i].Email == email {
+		if dao.accounts[i].GetEmail() == email {
 			return &dao.accounts[i], nil
 		}
 	}

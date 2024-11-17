@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 )
 
 type SignUp struct {
@@ -41,20 +40,6 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 
 	if account.ID != "" {
 		return nil, fmt.Errorf("duplicated account")
-	}
-
-	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(newAccount.Email)
-	if !matchEmail {
-		return nil, fmt.Errorf("invalid email")
-	}
-
-	if !validateCPF(newAccount.CPF) {
-		return nil, fmt.Errorf("invalid cpf")
-	}
-
-	matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(newAccount.CarPlate)
-	if newAccount.IsDriver && !matchCarPlate {
-		return nil, fmt.Errorf("invalid car plate")
 	}
 
 	err = signUp.accountDAO.SaveAccount(*newAccount)
