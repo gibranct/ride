@@ -19,7 +19,7 @@ func StartServer() {
 }
 
 func SignUpHandler(c echo.Context) error {
-	signUp := NewSignUpUseCase(NewAccountDAO())
+	signUp := NewSignUpUseCase(NewAccountDAO(), NewMailerGatewayMemory())
 	var input SignUpInput
 
 	if err := c.Bind(&input); err != nil {

@@ -9,7 +9,7 @@ import (
 )
 
 func Test_SignUpDriver(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -27,7 +27,7 @@ func Test_SignUpDriver(t *testing.T) {
 }
 
 func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -46,7 +46,7 @@ func Test_SignUpDriverWithInvalidCarPlate(t *testing.T) {
 }
 
 func Test_SignUpPassenger(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -65,7 +65,7 @@ func Test_SignUpPassenger(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -85,7 +85,7 @@ func Test_SignUpPassengerWithInvalidCPF(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
@@ -105,7 +105,7 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 }
 
 func Test_SignUpPassengerWithInvalidName(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -125,7 +125,7 @@ func Test_SignUpPassengerWithInvalidName(t *testing.T) {
 }
 
 func Test_SignUpDuplicatedPassenger(t *testing.T) {
-	signUp := NewSignUpUseCase(NewAccountDAOMemory())
+	signUp := NewSignUpUseCase(NewAccountDAOMemory(), NewMailerGatewayMemory())
 	account := SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
