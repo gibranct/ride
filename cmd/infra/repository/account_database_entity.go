@@ -1,4 +1,6 @@
-package main
+package repository
+
+import "github.com.br/gibranct/ride/cmd/domain"
 
 type AccountDatabaseEntity struct {
 	ID          string
@@ -11,8 +13,8 @@ type AccountDatabaseEntity struct {
 	Password    string
 }
 
-func (e *AccountDatabaseEntity) ToAccount() (*Account, error) {
-	return NewAccount(
+func (e *AccountDatabaseEntity) ToAccount() (*domain.Account, error) {
+	return domain.NewAccount(
 		e.ID,
 		e.Name,
 		e.Email,

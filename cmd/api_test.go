@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com.br/gibranct/ride/cmd/application/usecase"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,7 +19,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	type SignUpOutput struct {
 		AccountId string `json:"accountId"`
 	}
-	account := SignUpInput{
+	account := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
 		CPF:         "97456321558",
@@ -29,7 +30,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	}
 	jsonBytes, _ := json.Marshal(account)
 	var responseBody SignUpOutput
-	var newAccount GetAccountOutput
+	var newAccount usecase.GetAccountOutput
 
 	e := echo.New()
 
@@ -74,7 +75,7 @@ func Test_SignUpPassengerWithInvalidEmailAPI(t *testing.T) {
 	type SignUpOutput struct {
 		Message string `json:"message"`
 	}
-	signUpJson := SignUpInput{
+	signUpJson := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
 		CPF:         "97456321558",

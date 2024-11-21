@@ -1,7 +1,9 @@
-package main
+package usecase
+
+import "github.com.br/gibranct/ride/cmd/infra/repository"
 
 type GetAccount struct {
-	accountDAO AccountRepository
+	accountDAO repository.AccountRepository
 }
 
 type GetAccountOutput struct {
@@ -32,7 +34,7 @@ func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
 	}, nil
 }
 
-func NewGetAccountCase(accountDAO AccountRepository) *GetAccount {
+func NewGetAccountCase(accountDAO repository.AccountRepository) *GetAccount {
 	return &GetAccount{
 		accountDAO: accountDAO,
 	}

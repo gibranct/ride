@@ -1,4 +1,4 @@
-package main
+package domain
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ func Test_CreateAccountWithoutID(t *testing.T) {
 	assert.Equal(t, name, newAccount.GetName())
 	assert.Equal(t, email, newAccount.GetEmail())
 	assert.Equal(t, cpf, newAccount.GetCPF())
-	assert.Equal(t, carPlate, newAccount.GetCarPlate())
+	assert.Empty(t, newAccount.GetCarPlate())
 	assert.Equal(t, password, newAccount.Password)
 	assert.Equal(t, isPassenger, newAccount.IsPassenger)
 	assert.Equal(t, isDriver, newAccount.IsDriver)
@@ -63,7 +63,7 @@ func Test_CreateAccountWithID(t *testing.T) {
 	assert.Equal(t, name, newAccount.GetName())
 	assert.Equal(t, email, newAccount.GetEmail())
 	assert.Equal(t, cpf, newAccount.GetCPF())
-	assert.Equal(t, carPlate, newAccount.GetCarPlate())
+	assert.Empty(t, newAccount.GetCarPlate())
 	assert.Equal(t, password, newAccount.Password)
 	assert.Equal(t, isPassenger, newAccount.IsPassenger)
 	assert.Equal(t, isDriver, newAccount.IsDriver)
@@ -92,4 +92,28 @@ func Test_CreateAccountWithInvalidName(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid name", err.Error())
 	assert.Nil(t, newAccount)
+}
+
+func Test_CreateAccountWithCarPlateNilIfIsPassenger(t *testing.T) {
+	accountId := uuid.NewString()
+	name := "John Doe"
+	email := fmt.Sprintf("john_%d@mail.com", rand.Int())
+	cpf := "97456321558"
+	carPlate := ""
+	password := "password"
+	isPassenger := true
+	isDriver := false
+	newAccount, err := NewAccount(
+		accountId,
+		name,
+		email,
+		cpf,
+		carPlate,
+		password,
+		isPassenger,
+		isDriver,
+	)
+
+	assert.Nil(t, err)
+	assert.Empty(t, newAccount.GetCarPlate())
 }

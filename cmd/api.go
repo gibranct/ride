@@ -3,6 +3,9 @@ package main
 import (
 	"net/http"
 
+	"github.com.br/gibranct/ride/cmd/application/usecase"
+	"github.com.br/gibranct/ride/cmd/infra/gateway"
+	"github.com.br/gibranct/ride/cmd/infra/repository"
 	"github.com/labstack/echo/v4"
 )
 
@@ -19,8 +22,8 @@ func StartServer() {
 }
 
 func SignUpHandler(c echo.Context) error {
-	signUp := NewSignUpUseCase(NewAccountDAO(), NewMailerGatewayMemory())
-	var input SignUpInput
+	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
+	var input usecase.SignUpInput
 
 	if err := c.Bind(&input); err != nil {
 		c.String(http.StatusBadRequest, err.Error())
@@ -38,7 +41,7 @@ func SignUpHandler(c echo.Context) error {
 }
 
 func GetAccountByIDHandler(c echo.Context) error {
-	getAccount := NewGetAccountCase(NewAccountDAO())
+	getAccount := usecase.NewGetAccountCase(repository.NewAccountRepository())
 	accountId := c.Param("id")
 
 	account, err := getAccount.Execute(accountId)

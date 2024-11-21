@@ -1,4 +1,4 @@
-package main
+package domain
 
 import "github.com/google/uuid"
 
@@ -26,6 +26,9 @@ func (a *Account) GetCPF() string {
 }
 
 func (a *Account) GetCarPlate() string {
+	if a.carPlate == nil {
+		return ""
+	}
 	return a.carPlate.value
 }
 
@@ -45,8 +48,11 @@ func NewAccount(
 		return nil, err
 	}
 	newCarPlate, err := NewCarPlate(carPlate)
-	if err != nil {
+	if isDriver && err != nil {
 		return nil, err
+	}
+	if isPassenger {
+		newCarPlate = nil
 	}
 	return &Account{
 		ID:          accountId,

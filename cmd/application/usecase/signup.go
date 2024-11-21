@@ -1,12 +1,16 @@
-package main
+package usecase
 
 import (
 	"fmt"
+
+	"github.com.br/gibranct/ride/cmd/domain"
+	"github.com.br/gibranct/ride/cmd/infra/gateway"
+	"github.com.br/gibranct/ride/cmd/infra/repository"
 )
 
 type SignUp struct {
-	accountDAO    AccountRepository
-	mailerGateway MailerGateway
+	accountDAO    repository.AccountRepository
+	mailerGateway gateway.MailerGateway
 }
 
 type SignUpOutput struct {
@@ -24,7 +28,7 @@ type SignUpInput struct {
 }
 
 func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
-	newAccount, err := CreateAccount(
+	newAccount, err := domain.CreateAccount(
 		input.Name, input.Email, input.CPF, input.CarPlate,
 		input.Password, input.IsPassenger, input.IsDriver,
 	)
@@ -56,7 +60,7 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 	}, nil
 }
 
-func NewSignUpUseCase(accountDAO AccountRepository, mailer MailerGateway) *SignUp {
+func NewSignUpUseCase(accountDAO repository.AccountRepository, mailer gateway.MailerGateway) *SignUp {
 	return &SignUp{
 		accountDAO:    accountDAO,
 		mailerGateway: mailer,

@@ -1,25 +1,26 @@
-package main
+package repository
 
 import (
 	"context"
 	"fmt"
 	"os"
 
+	"github.com.br/gibranct/ride/cmd/domain"
 	"github.com/jackc/pgx/v5"
 )
 
 type AccountRepository interface {
-	GetAccountByEmail(email string) (*Account, error)
-	GetAccountByID(id string) (*Account, error)
-	SaveAccount(account Account) error
+	GetAccountByEmail(email string) (*domain.Account, error)
+	GetAccountByID(id string) (*domain.Account, error)
+	SaveAccount(account domain.Account) error
 }
 
 type AccountRepositoryDatabase struct{}
 type AccountRepositoryMemory struct {
-	accounts []Account
+	accounts []domain.Account
 }
 
-func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*Account, error) {
+func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Account, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
@@ -33,13 +34,13 @@ func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*Account, 
 	)
 
 	if account.ID == "" {
-		return &Account{}, nil
+		return &domain.Account{}, nil
 	}
 
 	return account.ToAccount()
 }
 
-func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*Account, error) {
+func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*domain.Account, error) {
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
@@ -55,7 +56,7 @@ func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*Account, error)
 	return account.ToAccount()
 }
 
-func (dao AccountRepositoryDatabase) SaveAccount(account Account) error {
+func (dao AccountRepositoryDatabase) SaveAccount(account domain.Account) error {
 	saveQuery := "insert into gct.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)"
 	conn, err := pgx.Connect(context.Background(), "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 	if err != nil {
@@ -71,31 +72,31 @@ func (dao AccountRepositoryDatabase) SaveAccount(account Account) error {
 	return err
 }
 
-func NewAccountDAO() AccountRepository {
+func NewAccountRepository() AccountRepository {
 	return &AccountRepositoryDatabase{}
 }
 
-func (dao *AccountRepositoryMemory) GetAccountByEmail(email string) (*Account, error) {
+func (dao *AccountRepositoryMemory) GetAccountByEmail(email string) (*domain.Account, error) {
 	for i := range dao.accounts {
 		if dao.accounts[i].GetEmail() == email {
 			return &dao.accounts[i], nil
 		}
 	}
 
-	return &Account{}, nil
+	return &domain.Account{}, nil
 }
 
-func (dao *AccountRepositoryMemory) GetAccountByID(id string) (*Account, error) {
+func (dao *AccountRepositoryMemory) GetAccountByID(id string) (*domain.Account, error) {
 	for i := range dao.accounts {
 		if dao.accounts[i].ID == id {
 			return &dao.accounts[i], nil
 		}
 	}
 
-	return &Account{}, nil
+	return &domain.Account{}, nil
 }
 
-func (dao *AccountRepositoryMemory) SaveAccount(account Account) error {
+func (dao *AccountRepositoryMemory) SaveAccount(account domain.Account) error {
 	dao.accounts = append(dao.accounts, account)
 	return nil
 }
