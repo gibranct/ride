@@ -18,3 +18,7 @@ func NewCarPlate(value string) (*CarPlate, error) {
 		value: value,
 	}, nil
 }
+
+func (cp *CarPlate) GetValue() string {
+	return cp.value
+}

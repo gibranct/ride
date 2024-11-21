@@ -74,3 +74,7 @@ func (c *CPF) extractDigit() string {
 	slice := c.value[9:]
 	return slice
 }
+
+func (c *CPF) GetValue() string {
+	return c.value
+}

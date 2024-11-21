@@ -18,3 +18,7 @@ func NewName(value string) (*Name, error) {
 		value: value,
 	}, nil
 }
+
+func (n *Name) GetValue() string {
+	return n.value
+}

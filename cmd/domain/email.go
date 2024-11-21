@@ -18,3 +18,7 @@ func NewEmail(value string) (*Email, error) {
 		value: value,
 	}, nil
 }
+
+func (e *Email) GetValue() string {
+	return e.value
+}

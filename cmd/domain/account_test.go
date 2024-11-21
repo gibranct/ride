@@ -1,10 +1,11 @@
-package domain
+package domain_test
 
 import (
 	"fmt"
 	"math/rand/v2"
 	"testing"
 
+	"github.com.br/gibranct/ride/cmd/domain"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +18,7 @@ func Test_CreateAccountWithoutID(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := CreateAccount(
+	newAccount, err := domain.CreateAccount(
 		name,
 		email,
 		cpf,
@@ -47,7 +48,7 @@ func Test_CreateAccountWithID(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := NewAccount(
+	newAccount, err := domain.NewAccount(
 		accountId,
 		name,
 		email,
@@ -78,7 +79,7 @@ func Test_CreateAccountWithInvalidName(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := NewAccount(
+	newAccount, err := domain.NewAccount(
 		accountId,
 		name,
 		email,
@@ -103,7 +104,7 @@ func Test_CreateAccountWithCarPlateNilIfIsPassenger(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := NewAccount(
+	newAccount, err := domain.NewAccount(
 		accountId,
 		name,
 		email,
