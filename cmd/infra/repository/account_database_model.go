@@ -2,7 +2,7 @@ package repository
 
 import "github.com.br/gibranct/ride/cmd/domain"
 
-type AccountDatabaseEntity struct {
+type AccountDatabaseModel struct {
 	ID          string
 	Name        string
 	Email       string
@@ -13,7 +13,7 @@ type AccountDatabaseEntity struct {
 	Password    string
 }
 
-func (e *AccountDatabaseEntity) ToAccount() (*domain.Account, error) {
+func (e *AccountDatabaseModel) ToAccount() (*domain.Account, error) {
 	return domain.NewAccount(
 		e.ID,
 		e.Name,

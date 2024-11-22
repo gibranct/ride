@@ -28,7 +28,7 @@ func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Ac
 	}
 	defer conn.Close(context.Background())
 
-	account := AccountDatabaseEntity{}
+	account := AccountDatabaseModel{}
 	conn.QueryRow(context.Background(), "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1", email).Scan(
 		&account.ID, &account.Name, &account.Email, &account.CPF, &account.CarPlate, &account.IsPassenger, &account.IsDriver,
 	)
@@ -48,7 +48,7 @@ func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*domain.Account,
 	}
 	defer conn.Close(context.Background())
 
-	var account AccountDatabaseEntity
+	var account AccountDatabaseModel
 	conn.QueryRow(context.Background(), "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where account_id = $1", id).Scan(
 		&account.ID, &account.Name, &account.Email, &account.CPF, &account.CarPlate, &account.IsPassenger, &account.IsDriver,
 	)
