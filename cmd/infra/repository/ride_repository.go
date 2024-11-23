@@ -11,7 +11,7 @@ import (
 
 type RideRepository interface {
 	GetRideByID(id string) (*domain.Ride, error)
-	SaveRide(account domain.Ride) error
+	SaveRide(ride domain.Ride) error
 }
 
 type RideRepositoryDatabase struct{}

@@ -26,9 +26,15 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 		RideId:      ride.GetRideId(),
 		PassengerId: ride.GetPassengerId(),
 		FromLat:     ride.GetFromCoord().GetLat(),
-		FromLong:    ride.GetFromCoord().GetLat(),
+		FromLong:    ride.GetFromCoord().GetLong(),
 		ToLat:       ride.GetToCoord().GetLat(),
-		ToLong:      ride.GetToCoord().GetLat(),
+		ToLong:      ride.GetToCoord().GetLong(),
 		Status:      ride.GetStatus(),
 	}, nil
+}
+
+func NewGetRideUseCase(rideRepo repository.RideRepository) *GetRide {
+	return &GetRide{
+		rideRepository: rideRepo,
+	}
 }
