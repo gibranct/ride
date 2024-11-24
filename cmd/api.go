@@ -4,12 +4,15 @@ import (
 	"net/http"
 
 	"github.com.br/gibranct/ride/cmd/application/usecase"
+	"github.com.br/gibranct/ride/cmd/infra/database"
 	"github.com.br/gibranct/ride/cmd/infra/gateway"
 	"github.com.br/gibranct/ride/cmd/infra/repository"
 	"github.com/labstack/echo/v4"
 )
 
 const PORT = "127.0.0.1:3333"
+
+var pgConn = database.NewPostgresAdapter()
 
 func StartServer() {
 	e := echo.New()
@@ -22,7 +25,7 @@ func StartServer() {
 }
 
 func SignUpHandler(c echo.Context) error {
-	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
+	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(pgConn), gateway.NewMailerGatewayMemory())
 	var input usecase.SignUpInput
 
 	if err := c.Bind(&input); err != nil {
@@ -41,7 +44,7 @@ func SignUpHandler(c echo.Context) error {
 }
 
 func GetAccountByIDHandler(c echo.Context) error {
-	getAccount := usecase.NewGetAccountCase(repository.NewAccountRepository())
+	getAccount := usecase.NewGetAccountCase(repository.NewAccountRepository(pgConn))
 	accountId := c.Param("id")
 
 	account, err := getAccount.Execute(accountId)

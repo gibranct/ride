@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com.br/gibranct/ride/cmd/application/usecase"
+	"github.com.br/gibranct/ride/cmd/infra/database"
 	"github.com.br/gibranct/ride/cmd/infra/gateway"
 	"github.com.br/gibranct/ride/cmd/infra/repository"
 	"github.com/google/uuid"
@@ -13,9 +14,11 @@ import (
 )
 
 var (
-	signUp      = usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
-	requestRide = usecase.NewRequestRideUseCase(repository.NewAccountRepository(), repository.NewRideRepository())
-	getRide     = usecase.NewGetRideUseCase(repository.NewRideRepository())
+	pgConn      = database.NewPostgresAdapter()
+	signUp      = usecase.NewSignUpUseCase(repository.NewAccountRepository(pgConn), gateway.NewMailerGatewayMemory())
+	requestRide = usecase.NewRequestRideUseCase(repository.NewAccountRepository(pgConn), repository.NewRideRepository(pgConn))
+	getRide     = usecase.NewGetRideUseCase(repository.NewRideRepository(pgConn))
+	getAccount  = usecase.NewGetAccountCase(repository.NewAccountRepository(pgConn))
 )
 
 func Test_RequestRide(t *testing.T) {
@@ -41,17 +44,18 @@ func Test_RequestRide(t *testing.T) {
 		ToLong:      -48.522234807851476,
 	}
 	outputRR, err := requestRide.Execute(rrInput)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, outputRR.RideId)
 
-	outputGR, err := getRide.Execute(outputRR.RideId)
 	if assert.NoError(t, err) {
-		assert.Equal(t, outputRR.RideId, outputGR.RideId)
-		assert.Equal(t, rrInput.PassengerId, outputGR.PassengerId)
-		assert.Equal(t, rrInput.FromLat, outputGR.FromLat)
-		assert.Equal(t, rrInput.FromLong, outputGR.FromLong)
-		assert.Equal(t, rrInput.ToLat, outputGR.ToLat)
-		assert.Equal(t, rrInput.ToLong, outputGR.ToLong)
+		assert.NotEmpty(t, outputRR.RideId)
+		outputGR, err := getRide.Execute(outputRR.RideId)
+		if assert.NoError(t, err) {
+			assert.Equal(t, outputRR.RideId, outputGR.RideId)
+			assert.Equal(t, rrInput.PassengerId, outputGR.PassengerId)
+			assert.Equal(t, rrInput.FromLat, outputGR.FromLat)
+			assert.Equal(t, rrInput.FromLong, outputGR.FromLong)
+			assert.Equal(t, rrInput.ToLat, outputGR.ToLat)
+			assert.Equal(t, rrInput.ToLong, outputGR.ToLong)
+		}
 	}
 }
 

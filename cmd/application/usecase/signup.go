@@ -32,7 +32,6 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 		input.Name, input.Email, input.CPF, input.CarPlate,
 		input.Password, input.IsPassenger, input.IsDriver,
 	)
-
 	if err != nil {
 		return nil, err
 	}

@@ -6,14 +6,10 @@ import (
 	"testing"
 
 	"github.com.br/gibranct/ride/cmd/application/usecase"
-	"github.com.br/gibranct/ride/cmd/infra/gateway"
-	"github.com.br/gibranct/ride/cmd/infra/repository"
 	"github.com/stretchr/testify/assert"
 )
 
 func Test_SignUpDriver(t *testing.T) {
-	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
-	getAccount := usecase.NewGetAccountCase(repository.NewAccountRepository())
 	account := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -26,22 +22,20 @@ func Test_SignUpDriver(t *testing.T) {
 	output, err := signUp.Execute(account)
 	if assert.NoError(t, err) {
 		assert.NotEmpty(t, output.AccountId)
-	}
-	accountOutput, err := getAccount.Execute(output.AccountId)
-	if assert.NoError(t, err) {
-		assert.Equal(t, output.AccountId, output.AccountId)
-		assert.Equal(t, account.Name, accountOutput.Name)
-		assert.Equal(t, account.Email, accountOutput.Email)
-		assert.Equal(t, account.CPF, accountOutput.CPF)
-		assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
-		assert.True(t, accountOutput.IsDriver)
-		assert.False(t, accountOutput.IsPassenger)
+		accountOutput, err := getAccount.Execute(output.AccountId)
+		if assert.NoError(t, err) {
+			assert.Equal(t, output.AccountId, output.AccountId)
+			assert.Equal(t, account.Name, accountOutput.Name)
+			assert.Equal(t, account.Email, accountOutput.Email)
+			assert.Equal(t, account.CPF, accountOutput.CPF)
+			assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
+			assert.True(t, accountOutput.IsDriver)
+			assert.False(t, accountOutput.IsPassenger)
+		}
 	}
 }
 
 func Test_SignUpPassenger(t *testing.T) {
-	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
-	getAccount := usecase.NewGetAccountCase(repository.NewAccountRepository())
 	account := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
@@ -54,21 +48,20 @@ func Test_SignUpPassenger(t *testing.T) {
 	output, err := signUp.Execute(account)
 	if assert.NoError(t, err) {
 		assert.NotEmpty(t, output.AccountId)
-	}
-	accountOutput, err := getAccount.Execute(output.AccountId)
-	if assert.NoError(t, err) {
-		assert.Equal(t, output.AccountId, output.AccountId)
-		assert.Equal(t, account.Name, accountOutput.Name)
-		assert.Equal(t, account.Email, accountOutput.Email)
-		assert.Equal(t, account.CPF, accountOutput.CPF)
-		assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
-		assert.True(t, accountOutput.IsPassenger)
-		assert.False(t, accountOutput.IsDriver)
+		accountOutput, err := getAccount.Execute(output.AccountId)
+		if assert.NoError(t, err) {
+			assert.Equal(t, output.AccountId, output.AccountId)
+			assert.Equal(t, account.Name, accountOutput.Name)
+			assert.Equal(t, account.Email, accountOutput.Email)
+			assert.Equal(t, account.CPF, accountOutput.CPF)
+			assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
+			assert.True(t, accountOutput.IsPassenger)
+			assert.False(t, accountOutput.IsDriver)
+		}
 	}
 }
 
 func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
-	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
 	account := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
@@ -88,7 +81,6 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 }
 
 func Test_SignUpDuplicatedPassenger(t *testing.T) {
-	signUp := usecase.NewSignUpUseCase(repository.NewAccountRepository(), gateway.NewMailerGatewayMemory())
 	account := usecase.SignUpInput{
 		Name:        "John Doe",
 		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
