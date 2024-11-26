@@ -1,4 +1,4 @@
-package main
+package http_test
 
 import (
 	"bytes"
@@ -10,10 +10,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com.br/gibranct/ride/cmd/application"
 	"github.com.br/gibranct/ride/cmd/application/usecase"
+	"github.com.br/gibranct/ride/cmd/infra/controller"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
+
+var accountCtrl = controller.NewAccountController(application.NewApplication().AccountService)
 
 func Test_SignUpDriverAPI(t *testing.T) {
 	type SignUpOutput struct {
@@ -40,7 +44,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUpHandler(ctx)) {
+	if assert.NoError(t, accountCtrl.SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusCreated, rec.Code)
@@ -57,7 +61,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 	ctx.SetParamNames("id")
 	ctx.SetParamValues(responseBody.AccountId)
 
-	if assert.NoError(t, GetAccountByIDHandler(ctx)) {
+	if assert.NoError(t, accountCtrl.GetAccountByIDHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &newAccount)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusOK, rec.Code)
@@ -94,7 +98,7 @@ func Test_SignUpPassengerWithInvalidEmailAPI(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.NoError(t, SignUpHandler(ctx)) {
+	if assert.NoError(t, accountCtrl.SignUpHandler(ctx)) {
 		err := json.Unmarshal(rec.Body.Bytes(), &responseBody)
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, rec.Code)
@@ -110,7 +114,7 @@ func Test_SignUpWithInvalidJSON(t *testing.T) {
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
 
-	if assert.Error(t, SignUpHandler(ctx)) {
+	if assert.Error(t, accountCtrl.SignUpHandler(ctx)) {
 		assert.Equal(t, http.StatusBadRequest, rec.Code)
 	}
 }

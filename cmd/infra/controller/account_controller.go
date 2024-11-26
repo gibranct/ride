@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"net/http"
@@ -8,21 +8,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const PORT = "127.0.0.1:3333"
-
-var app = application.NewApplication()
-
-func StartServer() {
-	e := echo.New()
-
-	e.POST("/sign-up", SignUpHandler)
-
-	e.GET("/v1/accounts/:id", GetAccountByIDHandler)
-
-	e.Logger.Fatal(e.Start(PORT))
+type AccountController struct {
+	accountService application.AccountService
 }
 
-func SignUpHandler(c echo.Context) error {
+func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 	var input usecase.SignUpInput
 
 	if err := c.Bind(&input); err != nil {
@@ -30,7 +20,7 @@ func SignUpHandler(c echo.Context) error {
 		return err
 	}
 
-	output, err := app.AccountService.SignUp.Execute(input)
+	output, err := accountCtrl.accountService.SignUp.Execute(input)
 
 	if err != nil {
 		response := map[string]any{"message": err.Error()}
@@ -40,13 +30,19 @@ func SignUpHandler(c echo.Context) error {
 	return c.JSON(http.StatusCreated, output)
 }
 
-func GetAccountByIDHandler(c echo.Context) error {
+func (accountCtrl *AccountController) GetAccountByIDHandler(c echo.Context) error {
 	accountId := c.Param("id")
-	account, err := app.AccountService.GetAccount.Execute(accountId)
+	account, err := accountCtrl.accountService.GetAccount.Execute(accountId)
 
 	if err != nil {
 		return err
 	}
 
 	return c.JSON(http.StatusOK, account)
+}
+
+func NewAccountController(accountService *application.AccountService) *AccountController {
+	return &AccountController{
+		accountService: *accountService,
+	}
 }
