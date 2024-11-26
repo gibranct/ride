@@ -6,19 +6,16 @@ import (
 	"testing"
 
 	"github.com.br/gibranct/ride/cmd/application/usecase"
-	"github.com.br/gibranct/ride/cmd/infra/database"
-	"github.com.br/gibranct/ride/cmd/infra/gateway"
-	"github.com.br/gibranct/ride/cmd/infra/repository"
+	di "github.com.br/gibranct/ride/cmd/infra/DI"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
 var (
-	pgConn      = database.NewPostgresAdapter()
-	signUp      = usecase.NewSignUpUseCase(repository.NewAccountRepository(pgConn), gateway.NewMailerGatewayMemory())
-	requestRide = usecase.NewRequestRideUseCase(repository.NewAccountRepository(pgConn), repository.NewRideRepository(pgConn))
-	getRide     = usecase.NewGetRideUseCase(repository.NewRideRepository(pgConn))
-	getAccount  = usecase.NewGetAccountCase(repository.NewAccountRepository(pgConn))
+	signUp      = di.NewSignUp()
+	requestRide = di.NewRequestRide()
+	getRide     = di.NewGetRide()
+	getAccount  = di.NewGetAccount()
 )
 
 func Test_RequestRide(t *testing.T) {

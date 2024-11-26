@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -37,12 +38,20 @@ func (pg *PostgresAdapter) Close() error {
 	return nil
 }
 
+var instance *PostgresAdapter
+
+var once sync.Once
+
 func NewPostgresAdapter() *PostgresAdapter {
-	db, err := sqlx.Connect("postgres", "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
-	if err != nil {
-		panic(err)
-	}
-	return &PostgresAdapter{
-		db: db,
-	}
+	once.Do(func() {
+		db, err := sqlx.Connect("postgres", "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
+		if err != nil {
+			panic(err)
+		}
+		instance = &PostgresAdapter{
+			db: db,
+		}
+	})
+
+	return instance
 }

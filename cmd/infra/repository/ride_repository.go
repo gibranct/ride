@@ -35,7 +35,7 @@ func (repo RideRepositoryDatabase) SaveRide(ride domain.Ride) error {
 	return repo.connection.ExecContext(context.Background(), saveQuery, args...)
 }
 
-func NewRideRepository(connection database.DatabaseConnection) RideRepository {
+func NewRideRepository(connection database.DatabaseConnection) *RideRepositoryDatabase {
 	return &RideRepositoryDatabase{
 		connection: connection,
 	}

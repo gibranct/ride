@@ -12,6 +12,6 @@ func (m *MailerGatewayMemory) Send(recipient, subject, message string) {
 	fmt.Printf("sending message: %s to %s with subject: %s", message, recipient, subject)
 }
 
-func NewMailerGatewayMemory() *MailerGatewayMemory {
+func NewMailerGatewayMemory() MailerGateway {
 	return &MailerGatewayMemory{}
 }

@@ -50,7 +50,7 @@ func (dao AccountRepositoryDatabase) SaveAccount(account domain.Account) error {
 	return dao.connection.ExecContext(context.Background(), saveQuery, args...)
 }
 
-func NewAccountRepository(conn database.DatabaseConnection) AccountRepository {
+func NewAccountRepository(conn database.DatabaseConnection) *AccountRepositoryDatabase {
 	return &AccountRepositoryDatabase{
 		connection: conn,
 	}

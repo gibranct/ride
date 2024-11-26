@@ -34,7 +34,7 @@ func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
 	}, nil
 }
 
-func NewGetAccountCase(accountDAO repository.AccountRepository) *GetAccount {
+func NewGetAccountUseCase(accountDAO repository.AccountRepository) *GetAccount {
 	return &GetAccount{
 		accountDAO: accountDAO,
 	}
