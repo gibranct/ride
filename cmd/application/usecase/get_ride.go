@@ -9,6 +9,7 @@ type GetRide struct {
 type GetRideOutput struct {
 	RideId      string
 	PassengerId string
+	DriverId    string
 	FromLat     float64
 	FromLong    float64
 	ToLat       float64
@@ -25,6 +26,7 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 	return &GetRideOutput{
 		RideId:      ride.GetRideId(),
 		PassengerId: ride.GetPassengerId(),
+		DriverId:    ride.GetDriverId(),
 		FromLat:     ride.GetFromCoord().GetLat(),
 		FromLong:    ride.GetFromCoord().GetLong(),
 		ToLat:       ride.GetToCoord().GetLat(),

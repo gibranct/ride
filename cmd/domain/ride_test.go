@@ -12,6 +12,7 @@ import (
 func Test_CreateRide(t *testing.T) {
 	rideId := uuid.NewString()
 	passengerId := uuid.NewString()
+	driverId := uuid.NewString()
 	fromLat := 89.0
 	fromLong := 180.0
 	toLat := 87.0
@@ -19,11 +20,12 @@ func Test_CreateRide(t *testing.T) {
 	status := "requested"
 	date := time.Now()
 
-	ride, err := domain.NewRide(rideId, passengerId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
 
 	assert.Nil(t, err)
 	assert.Equal(t, rideId, ride.GetRideId())
 	assert.Equal(t, passengerId, ride.GetPassengerId())
+	assert.Equal(t, driverId, ride.GetDriverId())
 	assert.Equal(t, fromLat, ride.GetFromCoord().GetLat())
 	assert.Equal(t, fromLong, ride.GetFromCoord().GetLong())
 	assert.Equal(t, toLat, ride.GetToCoord().GetLat())
@@ -34,6 +36,7 @@ func Test_CreateRide(t *testing.T) {
 
 func Test_CreateRideWithoutID(t *testing.T) {
 	passengerId := uuid.NewString()
+	driverId := ""
 	fromLat := 89.0
 	fromLong := 180.0
 	toLat := 87.0
@@ -45,6 +48,7 @@ func Test_CreateRideWithoutID(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEmpty(t, ride.GetRideId())
 	assert.Equal(t, passengerId, ride.GetPassengerId())
+	assert.Equal(t, driverId, ride.GetDriverId())
 	assert.Equal(t, fromLat, ride.GetFromCoord().GetLat())
 	assert.Equal(t, fromLong, ride.GetFromCoord().GetLong())
 	assert.Equal(t, toLat, ride.GetToCoord().GetLat())

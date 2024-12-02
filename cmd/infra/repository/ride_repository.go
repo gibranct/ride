@@ -10,6 +10,7 @@ import (
 type RideRepository interface {
 	GetRideByID(id string) (*domain.Ride, error)
 	SaveRide(ride domain.Ride) error
+	UpdateRide(ride domain.Ride) error
 }
 
 type RideRepositoryDatabase struct {
@@ -18,7 +19,7 @@ type RideRepositoryDatabase struct {
 
 func (repo RideRepositoryDatabase) GetRideByID(id string) (*domain.Ride, error) {
 	var rideModel RideDatabaseModel
-	query := "select ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date from gct.ride where ride_id = $1"
+	query := "select ride_id, passenger_id, driver_id, from_lat, from_long, to_lat, to_long, status, date from gct.ride where ride_id = $1"
 	err := repo.connection.QueryWithContext(context.Background(), &rideModel, query, id)
 	if err != nil {
 		return nil, err
@@ -33,6 +34,14 @@ func (repo RideRepositoryDatabase) SaveRide(ride domain.Ride) error {
 		ride.GetRideId(), ride.GetPassengerId(), ride.GetFromCoord().GetLat(), ride.GetFromCoord().GetLong(), ride.GetToCoord().GetLat(), ride.GetToCoord().GetLong(), ride.GetStatus(), ride.GetDate(),
 	}
 	return repo.connection.ExecContext(context.Background(), saveQuery, args...)
+}
+
+func (repo RideRepositoryDatabase) UpdateRide(ride domain.Ride) error {
+	updateQuery := "update gct.ride set status = $1, driver_id = $2 where ride_id = $3"
+	args := []any{
+		ride.GetStatus(), ride.GetDriverId(), ride.GetRideId(),
+	}
+	return repo.connection.ExecContext(context.Background(), updateQuery, args...)
 }
 
 func NewRideRepository(connection database.DatabaseConnection) *RideRepositoryDatabase {

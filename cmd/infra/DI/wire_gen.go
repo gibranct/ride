@@ -46,6 +46,14 @@ func NewGetRide() *usecase.GetRide {
 	return getRide
 }
 
+func NewAcceptRide() *usecase.AcceptRide {
+	postgresAdapter := database.NewPostgresAdapter()
+	accountRepositoryDatabase := repository.NewAccountRepository(postgresAdapter)
+	rideRepositoryDatabase := repository.NewRideRepository(postgresAdapter)
+	acceptRide := usecase.NewAcceptRideUseCase(accountRepositoryDatabase, rideRepositoryDatabase)
+	return acceptRide
+}
+
 // wire.go:
 
 var allReposSet = wire.NewSet(repository.NewAccountRepository, wire.Bind(new(repository.AccountRepository), new(*repository.AccountRepositoryDatabase)), repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)), database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))

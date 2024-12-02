@@ -66,3 +66,11 @@ func NewGetRide() *usecase.GetRide {
 	)
 	return &usecase.GetRide{}
 }
+
+func NewAcceptRide() *usecase.AcceptRide {
+	wire.Build(
+		usecase.NewAcceptRideUseCase,
+		allReposSet,
+	)
+	return &usecase.AcceptRide{}
+}
