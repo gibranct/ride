@@ -30,7 +30,7 @@ func Test_SignUpDriverAPI(t *testing.T) {
 		CarPlate:    "AAA1234",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	jsonBytes, _ := json.Marshal(account)
 	var responseBody SignUpOutput
@@ -86,7 +86,7 @@ func Test_SignUpPassengerWithInvalidEmailAPI(t *testing.T) {
 		CarPlate:    "AAA1234",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	jsonBytes, _ := json.Marshal(signUpJson)
 	var responseBody SignUpOutput

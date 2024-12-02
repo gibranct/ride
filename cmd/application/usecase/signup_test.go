@@ -17,7 +17,7 @@ func Test_SignUpDriver(t *testing.T) {
 		CarPlate:    "AAA1234",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	output, err := signUp.Execute(account)
 	if assert.NoError(t, err) {
@@ -43,7 +43,7 @@ func Test_SignUpPassenger(t *testing.T) {
 		CarPlate:    "",
 		IsPassenger: true,
 		IsDriver:    false,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	output, err := signUp.Execute(account)
 	if assert.NoError(t, err) {
@@ -69,7 +69,7 @@ func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
 		CarPlate:    "AAA1234",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 
 	output, err := signUp.Execute(account)
@@ -88,7 +88,7 @@ func Test_SignUpDuplicatedPassenger(t *testing.T) {
 		CarPlate:    "AAA1234",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 
 	signUp.Execute(account)

@@ -22,7 +22,7 @@ func Test_AcceptRide(t *testing.T) {
 		CarPlate:    "",
 		IsPassenger: true,
 		IsDriver:    false,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	outputSignUpPassenger, err := signUp.Execute(inputSignupPassenger)
 	if assert.NoError(t, err) {
@@ -36,7 +36,7 @@ func Test_AcceptRide(t *testing.T) {
 		CarPlate:    "AAA8998",
 		IsPassenger: false,
 		IsDriver:    true,
-		Password:    "secret",
+		Password:    "secret123",
 	}
 	outputSignUpDriver, err := signUp.Execute(inputSignupDriver)
 	if assert.NoError(t, err) {

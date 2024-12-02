@@ -34,7 +34,7 @@ func Test_CreateAccountWithoutID(t *testing.T) {
 	assert.Equal(t, email, newAccount.GetEmail())
 	assert.Equal(t, cpf, newAccount.GetCPF())
 	assert.Empty(t, newAccount.GetCarPlate())
-	assert.Equal(t, password, newAccount.Password)
+	assert.Equal(t, password, newAccount.GetPassword())
 	assert.Equal(t, isPassenger, newAccount.IsPassenger)
 	assert.Equal(t, isDriver, newAccount.IsDriver)
 }
@@ -65,7 +65,7 @@ func Test_CreateAccountWithID(t *testing.T) {
 	assert.Equal(t, email, newAccount.GetEmail())
 	assert.Equal(t, cpf, newAccount.GetCPF())
 	assert.Empty(t, newAccount.GetCarPlate())
-	assert.Equal(t, password, newAccount.Password)
+	assert.Equal(t, password, newAccount.GetPassword())
 	assert.Equal(t, isPassenger, newAccount.IsPassenger)
 	assert.Equal(t, isDriver, newAccount.IsDriver)
 }

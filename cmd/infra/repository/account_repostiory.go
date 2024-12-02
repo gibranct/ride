@@ -20,7 +20,7 @@ type AccountRepositoryDatabase struct {
 
 func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Account, error) {
 	account := &AccountDatabaseModel{}
-	query := "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1"
+	query := "select account_id, password, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1"
 	err := dao.connection.QueryWithContext(context.Background(), account, query, email)
 	if err != nil && strings.Contains(err.Error(), "no rows in result set") {
 		return &domain.Account{}, nil
@@ -33,7 +33,7 @@ func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Ac
 
 func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*domain.Account, error) {
 	var account AccountDatabaseModel
-	query := "select account_id, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where account_id = $1"
+	query := "select account_id, password, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where account_id = $1"
 	err := dao.connection.QueryWithContext(context.Background(), &account, query, id)
 	if err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*domain.Account,
 func (dao AccountRepositoryDatabase) SaveAccount(account domain.Account) error {
 	saveQuery := "insert into gct.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)"
 	args := []any{
-		account.ID, account.GetName(), account.GetEmail(), account.GetCPF(), account.GetCarPlate(), account.IsPassenger, account.IsDriver, account.Password,
+		account.ID, account.GetName(), account.GetEmail(), account.GetCPF(), account.GetCarPlate(), account.IsPassenger, account.IsDriver, account.GetPassword(),
 	}
 	return dao.connection.ExecContext(context.Background(), saveQuery, args...)
 }

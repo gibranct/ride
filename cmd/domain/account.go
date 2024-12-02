@@ -1,6 +1,9 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com.br/gibranct/ride/cmd/domain/vo"
+	"github.com/google/uuid"
+)
 
 type Account struct {
 	ID          string
@@ -10,7 +13,7 @@ type Account struct {
 	carPlate    *CarPlate
 	IsPassenger bool
 	IsDriver    bool
-	Password    string
+	password    *vo.Password
 }
 
 func (a *Account) GetName() string {
@@ -30,6 +33,10 @@ func (a *Account) GetCarPlate() string {
 		return ""
 	}
 	return a.carPlate.value
+}
+
+func (a *Account) GetPassword() string {
+	return a.password.Value
 }
 
 func NewAccount(
@@ -54,13 +61,18 @@ func NewAccount(
 	if isPassenger {
 		newCarPlate = nil
 	}
+	validPassword, err := vo.NewPassword(password)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Account{
 		ID:          accountId,
 		name:        newName,
 		email:       newEmail,
 		cpf:         newCPF,
 		carPlate:    newCarPlate,
-		Password:    password,
+		password:    validPassword,
 		IsPassenger: isPassenger,
 		IsDriver:    isDriver,
 	}, nil
