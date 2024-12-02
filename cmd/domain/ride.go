@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com.br/gibranct/ride/cmd/domain/vo"
 	"github.com/google/uuid"
 )
 
@@ -10,8 +11,8 @@ type Ride struct {
 	rideId      string
 	passengerId string
 	driverId    string
-	from        *Coord
-	to          *Coord
+	from        *vo.Coord
+	to          *vo.Coord
 	status      RideStatus
 	date        *time.Time
 }
@@ -19,12 +20,12 @@ type Ride struct {
 func NewRide(
 	rideId, passengerId, driverId string, fromLat, fromLong, toLat, toLong float64, status string, date time.Time,
 ) (*Ride, error) {
-	fromCoord, err := NewCoord(fromLat, fromLong)
+	fromCoord, err := vo.NewCoord(fromLat, fromLong)
 	if err != nil {
 		return nil, err
 	}
 
-	toCoord, err := NewCoord(toLat, toLong)
+	toCoord, err := vo.NewCoord(toLat, toLong)
 	if err != nil {
 		return nil, err
 	}
@@ -70,11 +71,11 @@ func (r *Ride) GetDriverId() string {
 	return r.driverId
 }
 
-func (r *Ride) GetFromCoord() *Coord {
+func (r *Ride) GetFromCoord() *vo.Coord {
 	return r.from
 }
 
-func (r *Ride) GetToCoord() *Coord {
+func (r *Ride) GetToCoord() *vo.Coord {
 	return r.to
 }
 

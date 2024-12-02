@@ -7,32 +7,32 @@ import (
 
 type Account struct {
 	ID          string
-	name        *Name
-	email       *Email
-	cpf         *CPF
-	carPlate    *CarPlate
+	name        *vo.Name
+	email       *vo.Email
+	cpf         *vo.CPF
+	carPlate    *vo.CarPlate
 	IsPassenger bool
 	IsDriver    bool
 	password    *vo.Password
 }
 
 func (a *Account) GetName() string {
-	return a.name.value
+	return a.name.GetValue()
 }
 
 func (a *Account) GetEmail() string {
-	return a.email.value
+	return a.email.GetValue()
 }
 
 func (a *Account) GetCPF() string {
-	return a.cpf.value
+	return a.cpf.GetValue()
 }
 
 func (a *Account) GetCarPlate() string {
 	if a.carPlate == nil {
 		return ""
 	}
-	return a.carPlate.value
+	return a.carPlate.GetValue()
 }
 
 func (a *Account) GetPassword() string {
@@ -42,19 +42,19 @@ func (a *Account) GetPassword() string {
 func NewAccount(
 	accountId, name, email, cpf, carPlate, password string, isPassenger, isDriver bool,
 ) (*Account, error) {
-	newName, err := NewName(name)
+	newName, err := vo.NewName(name)
 	if err != nil {
 		return nil, err
 	}
-	newEmail, err := NewEmail(email)
+	newEmail, err := vo.NewEmail(email)
 	if err != nil {
 		return nil, err
 	}
-	newCPF, err := NewCPF(cpf)
+	newCPF, err := vo.NewCPF(cpf)
 	if err != nil {
 		return nil, err
 	}
-	newCarPlate, err := NewCarPlate(carPlate)
+	newCarPlate, err := vo.NewCarPlate(carPlate)
 	if isDriver && err != nil {
 		return nil, err
 	}
