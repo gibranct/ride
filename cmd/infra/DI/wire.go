@@ -74,3 +74,11 @@ func NewAcceptRide() *usecase.AcceptRide {
 	)
 	return &usecase.AcceptRide{}
 }
+
+func NewStartRide() *usecase.StartRide {
+	wire.Build(
+		usecase.NewStartRideUseCase,
+		rideSet,
+	)
+	return &usecase.StartRide{}
+}

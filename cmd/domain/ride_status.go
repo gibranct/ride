@@ -31,7 +31,7 @@ func (rq *RequestedStatus) Request() error {
 }
 
 func (rq *RequestedStatus) Accept() error {
-	rq.ride.SetStatus(NewAcceptedStatus(rq.ride))
+	rq.ride.setStatus(NewAcceptedStatus(rq.ride))
 	return nil
 }
 
@@ -64,7 +64,7 @@ func (rq *AcceptedStatus) Accept() error {
 }
 
 func (rq *AcceptedStatus) Start() error {
-	rq.ride.SetStatus(NewInProgressStatus(rq.ride))
+	rq.ride.setStatus(NewInProgressStatus(rq.ride))
 	return nil
 }
 

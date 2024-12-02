@@ -40,7 +40,7 @@ func NewRide(
 	}
 
 	rideStatus, err := NewRideStatus(status, ride)
-	ride.SetStatus(rideStatus)
+	ride.setStatus(rideStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (r *Ride) GetDate() *time.Time {
 	return r.date
 }
 
-func (r *Ride) SetStatus(status RideStatus) {
+func (r *Ride) setStatus(status RideStatus) {
 	r.status = status
 }
 
@@ -96,5 +96,12 @@ func (r *Ride) Accept(driverId string) error {
 		return err
 	}
 	r.driverId = driverId
+	return nil
+}
+
+func (r *Ride) Start() error {
+	if err := r.status.Start(); err != nil {
+		return err
+	}
 	return nil
 }
