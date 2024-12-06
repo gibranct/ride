@@ -23,10 +23,10 @@ func NewCoord(lat, long float64) (*Coord, error) {
 	}, nil
 }
 
-func (c *Coord) GetLat() float64 {
+func (c Coord) GetLat() float64 {
 	return c.lat
 }
 
-func (c *Coord) GetLong() float64 {
+func (c Coord) GetLong() float64 {
 	return c.long
 }
