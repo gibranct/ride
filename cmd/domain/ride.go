@@ -3,6 +3,7 @@ package domain
 import (
 	"time"
 
+	"github.com.br/gibranct/ride/cmd/domain/service"
 	"github.com.br/gibranct/ride/cmd/domain/vo"
 	"github.com/google/uuid"
 )
@@ -104,4 +105,16 @@ func (r *Ride) Start() error {
 		return err
 	}
 	return nil
+}
+
+func (r *Ride) GetDistance(positions []Position) float64 {
+	distance := 0.0
+	for idx, pos := range positions {
+		if idx >= len(positions)-1 {
+			continue
+		}
+		nextPosition := positions[idx+1]
+		distance += service.NewDistanceCalculator().Calculate(pos.GetCoord(), nextPosition.GetCoord())
+	}
+	return distance
 }

@@ -3,7 +3,8 @@ package usecase
 import "github.com.br/gibranct/ride/cmd/infra/repository"
 
 type GetRide struct {
-	rideRepository repository.RideRepository
+	rideRepository     repository.RideRepository
+	positionRepository repository.PositionRepository
 }
 
 type GetRideOutput struct {
@@ -15,6 +16,7 @@ type GetRideOutput struct {
 	ToLat       float64
 	ToLong      float64
 	Status      string
+	Distance    float64
 }
 
 func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
@@ -22,6 +24,11 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 	if err != nil {
 		return nil, err
 	}
+	positions, err := gr.positionRepository.GetPositionsByRideId(rideId)
+	if err != nil {
+		return nil, err
+	}
+	distance := ride.GetDistance(positions)
 
 	return &GetRideOutput{
 		RideId:      ride.GetRideId(),
@@ -32,11 +39,13 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 		ToLat:       ride.GetToCoord().GetLat(),
 		ToLong:      ride.GetToCoord().GetLong(),
 		Status:      ride.GetStatus(),
+		Distance:    distance,
 	}, nil
 }
 
-func NewGetRideUseCase(rideRepo repository.RideRepository) *GetRide {
+func NewGetRideUseCase(rideRepo repository.RideRepository, positionRepository repository.PositionRepository) *GetRide {
 	return &GetRide{
-		rideRepository: rideRepo,
+		rideRepository:     rideRepo,
+		positionRepository: positionRepository,
 	}
 }

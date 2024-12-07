@@ -42,7 +42,8 @@ func NewRequestRide() *usecase.RequestRide {
 func NewGetRide() *usecase.GetRide {
 	postgresAdapter := database.NewPostgresAdapter()
 	rideRepositoryDatabase := repository.NewRideRepository(postgresAdapter)
-	getRide := usecase.NewGetRideUseCase(rideRepositoryDatabase)
+	positionRepositoryDatabase := repository.NewPositionRepository(postgresAdapter)
+	getRide := usecase.NewGetRideUseCase(rideRepositoryDatabase, positionRepositoryDatabase)
 	return getRide
 }
 
@@ -61,10 +62,22 @@ func NewStartRide() *usecase.StartRide {
 	return startRide
 }
 
+func NewUpdatePosition() *usecase.UpdatePosition {
+	postgresAdapter := database.NewPostgresAdapter()
+	rideRepositoryDatabase := repository.NewRideRepository(postgresAdapter)
+	positionRepositoryDatabase := repository.NewPositionRepository(postgresAdapter)
+	updatePosition := usecase.NewUpdatePositionUseCase(rideRepositoryDatabase, positionRepositoryDatabase)
+	return updatePosition
+}
+
 // wire.go:
+
+var databaseSet = wire.NewSet(database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
 
 var allReposSet = wire.NewSet(repository.NewAccountRepository, wire.Bind(new(repository.AccountRepository), new(*repository.AccountRepositoryDatabase)), repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)), database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
 
 var accountSet = wire.NewSet(repository.NewAccountRepository, wire.Bind(new(repository.AccountRepository), new(*repository.AccountRepositoryDatabase)), database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
 
-var rideSet = wire.NewSet(repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)), database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
+var rideSet = wire.NewSet(repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)))
+
+var positionRepoSet = wire.NewSet(repository.NewPositionRepository, wire.Bind(new(repository.PositionRepository), new(*repository.PositionRepositoryDatabase)))

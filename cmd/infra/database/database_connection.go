@@ -13,6 +13,7 @@ import (
 type DatabaseConnection interface {
 	QueryWithContext(ctx context.Context, dest any, query string, params ...any) error
 	ExecContext(ctx context.Context, query string, params ...any) error
+	SelectContext(ctx context.Context, dest any, query string, params ...any) error
 	Close() error
 }
 
@@ -27,6 +28,10 @@ func (pg *PostgresAdapter) QueryWithContext(ctx context.Context, dest any, query
 func (pg *PostgresAdapter) ExecContext(ctx context.Context, query string, params ...any) error {
 	_, err := pg.db.ExecContext(ctx, query, params...)
 	return err
+}
+
+func (pg *PostgresAdapter) SelectContext(ctx context.Context, dest any, query string, params ...any) error {
+	return pg.db.SelectContext(ctx, dest, query, params...)
 }
 
 func (pg *PostgresAdapter) Close() error {

@@ -11,6 +11,11 @@ import (
 	"github.com/google/wire"
 )
 
+var databaseSet = wire.NewSet(
+	database.NewPostgresAdapter,
+	wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)),
+)
+
 var allReposSet = wire.NewSet(
 	repository.NewAccountRepository,
 	wire.Bind(new(repository.AccountRepository), new(*repository.AccountRepositoryDatabase)),
@@ -30,8 +35,11 @@ var accountSet = wire.NewSet(
 var rideSet = wire.NewSet(
 	repository.NewRideRepository,
 	wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)),
-	database.NewPostgresAdapter,
-	wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)),
+)
+
+var positionRepoSet = wire.NewSet(
+	repository.NewPositionRepository,
+	wire.Bind(new(repository.PositionRepository), new(*repository.PositionRepositoryDatabase)),
 )
 
 func NewSignUp() *usecase.SignUp {
@@ -63,6 +71,8 @@ func NewGetRide() *usecase.GetRide {
 	wire.Build(
 		usecase.NewGetRideUseCase,
 		rideSet,
+		positionRepoSet,
+		databaseSet,
 	)
 	return &usecase.GetRide{}
 }
@@ -79,6 +89,17 @@ func NewStartRide() *usecase.StartRide {
 	wire.Build(
 		usecase.NewStartRideUseCase,
 		rideSet,
+		databaseSet,
 	)
 	return &usecase.StartRide{}
+}
+
+func NewUpdatePosition() *usecase.UpdatePosition {
+	wire.Build(
+		usecase.NewUpdatePositionUseCase,
+		rideSet,
+		positionRepoSet,
+		databaseSet,
+	)
+	return &usecase.UpdatePosition{}
 }
