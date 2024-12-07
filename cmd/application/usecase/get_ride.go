@@ -1,6 +1,9 @@
 package usecase
 
-import "github.com.br/gibranct/ride/cmd/infra/repository"
+import (
+	"github.com.br/gibranct/ride/cmd/domain"
+	"github.com.br/gibranct/ride/cmd/infra/repository"
+)
 
 type GetRide struct {
 	rideRepository     repository.RideRepository
@@ -16,6 +19,7 @@ type GetRideOutput struct {
 	ToLat       float64
 	ToLong      float64
 	Status      string
+	Positions   []domain.Position
 	Distance    float64
 }
 
@@ -39,6 +43,7 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 		ToLat:       ride.GetToCoord().GetLat(),
 		ToLong:      ride.GetToCoord().GetLong(),
 		Status:      ride.GetStatus(),
+		Positions:   positions,
 		Distance:    distance,
 	}, nil
 }
