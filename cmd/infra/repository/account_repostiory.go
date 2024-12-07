@@ -6,6 +6,7 @@ import (
 
 	"github.com.br/gibranct/ride/cmd/domain"
 	"github.com.br/gibranct/ride/cmd/infra/database"
+	"github.com.br/gibranct/ride/cmd/infra/repository/model"
 )
 
 type AccountRepository interface {
@@ -19,7 +20,7 @@ type AccountRepositoryDatabase struct {
 }
 
 func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Account, error) {
-	account := &AccountDatabaseModel{}
+	account := &model.AccountDatabaseModel{}
 	query := "select account_id, password, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1"
 	err := dao.connection.QueryWithContext(context.Background(), account, query, email)
 	if err != nil && strings.Contains(err.Error(), "no rows in result set") {
@@ -32,7 +33,7 @@ func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Ac
 }
 
 func (dao AccountRepositoryDatabase) GetAccountByID(id string) (*domain.Account, error) {
-	var account AccountDatabaseModel
+	var account model.AccountDatabaseModel
 	query := "select account_id, password, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where account_id = $1"
 	err := dao.connection.QueryWithContext(context.Background(), &account, query, id)
 	if err != nil {
