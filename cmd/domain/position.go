@@ -49,8 +49,11 @@ func NewPosition(positionId, rideId string, lat, long float64, date time.Time) (
 	}, nil
 }
 
-func CreatePosition(rideId string, lat, long float64) (*Position, error) {
+func CreatePosition(rideId string, lat, long float64, date *time.Time) (*Position, error) {
 	positionId := uuid.NewString()
-	date := time.Now()
-	return NewPosition(positionId, rideId, lat, long, date)
+	now := time.Now()
+	if date == nil {
+		date = &now
+	}
+	return NewPosition(positionId, rideId, lat, long, *date)
 }
