@@ -25,3 +25,19 @@ func (dc *DistanceCalculator) Calculate(from, to vo.Coord) float64 {
 	distance := earthRadiusKm * c
 	return math.Round(distance)
 }
+
+func (dc *DistanceCalculator) CalculateByPositions(positions []Position) float64 {
+	distance := 0.0
+	for idx, pos := range positions {
+		if idx >= len(positions)-1 {
+			continue
+		}
+		nextPosition := positions[idx+1]
+		distance += dc.Calculate(pos.GetCoord(), nextPosition.GetCoord())
+	}
+	return distance
+}
+
+type Position interface {
+	GetCoord() vo.Coord
+}
