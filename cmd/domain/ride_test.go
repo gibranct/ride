@@ -9,6 +9,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Must[T any](value T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
+
 func Test_CreateRide(t *testing.T) {
 	rideId := uuid.NewString()
 	passengerId := uuid.NewString()
@@ -69,4 +76,49 @@ func Test_CreateRideWithoutInvalidLat(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "invalid latitude", err.Error())
 	assert.Nil(t, ride)
+}
+
+func Test_RideFinishWithOnePosition(t *testing.T) {
+	rideId := uuid.NewString()
+	passengerId := uuid.NewString()
+	driverId := uuid.NewString()
+	fromLat := 0.0
+	fromLong := 0.0
+	toLat := 0.0
+	toLong := 0.0
+	status := "in_progress"
+	date := time.Now()
+
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	assert.NoError(t, err)
+
+	p1, err := domain.CreatePosition(rideId, 0.0, 0.0, &date)
+	assert.NoError(t, err)
+
+	positions := []domain.Position{*p1}
+
+	ride.Finish(positions)
+
+	assert.Equal(t, 0.0, ride.GetDistance(positions))
+	assert.Equal(t, 0.0, ride.GetFare())
+}
+
+func Test_RideFinishWithEmptyPositions(t *testing.T) {
+	rideId := uuid.NewString()
+	passengerId := uuid.NewString()
+	driverId := uuid.NewString()
+	fromLat := 89.0
+	fromLong := 180.0
+	toLat := 87.0
+	toLong := 179.0
+	status := "in_progress"
+	date := time.Now()
+
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	assert.NoError(t, err)
+
+	ride.Finish([]domain.Position{})
+
+	assert.Equal(t, 0.0, ride.GetDistance([]domain.Position{}))
+	assert.Equal(t, 0.0, ride.GetFare())
 }

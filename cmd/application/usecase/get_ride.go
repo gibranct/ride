@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com.br/gibranct/ride/cmd/domain"
+	"github.com.br/gibranct/ride/cmd/domain/service"
 	"github.com.br/gibranct/ride/cmd/infra/repository"
 )
 
@@ -32,7 +33,16 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 	if err != nil {
 		return nil, err
 	}
-	distance := ride.GetDistance(positions)
+	var distance float64
+	if ride.GetStatus() == domain.COMPLETED_RIDE_STATUS {
+		distance = ride.GetDistance(positions)
+	} else {
+		var newPositions []service.Position
+		for _, pos := range positions {
+			newPositions = append(newPositions, pos)
+		}
+		distance = service.NewDistanceCalculator().CalculateByPositions(newPositions)
+	}
 
 	return &GetRideOutput{
 		RideId:      ride.GetRideId(),

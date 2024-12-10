@@ -32,7 +32,7 @@ func (p *Position) GetRideId() string {
 	return p.rideId
 }
 
-func (p *Position) GetCoord() vo.Coord {
+func (p Position) GetCoord() vo.Coord {
 	return *p.coord
 }
 

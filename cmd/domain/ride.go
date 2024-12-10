@@ -16,6 +16,8 @@ type Ride struct {
 	to          *vo.Coord
 	status      RideStatus
 	date        *time.Time
+	distance    float64
+	fare        float64
 }
 
 func NewRide(
@@ -108,13 +110,23 @@ func (r *Ride) Start() error {
 }
 
 func (r *Ride) GetDistance(positions []Position) float64 {
-	distance := 0.0
+	return r.distance
+}
+
+func (r *Ride) Finish(positions []Position) {
+	r.distance = 0
+	r.fare = 0
 	for idx, pos := range positions {
 		if idx >= len(positions)-1 {
 			continue
 		}
 		nextPosition := positions[idx+1]
-		distance += service.NewDistanceCalculator().Calculate(pos.GetCoord(), nextPosition.GetCoord())
+		distance := service.NewDistanceCalculator().Calculate(pos.GetCoord(), nextPosition.GetCoord())
+		r.distance += distance
+		r.fare += service.NewFareCalculator(*pos.Date).Calculate(distance)
 	}
-	return distance
+}
+
+func (r *Ride) GetFare() float64 {
+	return r.fare
 }

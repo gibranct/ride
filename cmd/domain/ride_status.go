@@ -12,6 +12,7 @@ const (
 	REQUESTED_RIDE_STATUS   string = "requested"
 	ACCEPTED_RIDE_STATUS    string = "accepted"
 	IN_PROGRESS_RIDE_STATUS string = "in_progress"
+	COMPLETED_RIDE_STATUS   string = "completed"
 )
 
 type RideStatus interface {

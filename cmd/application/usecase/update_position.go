@@ -23,7 +23,7 @@ func (ar *UpdatePosition) Execute(input UpdatePositionInput) error {
 	if err != nil {
 		return fmt.Errorf("ride not found: %s", err)
 	}
-	newPosition, err := domain.CreatePosition(input.RideId, input.Lat, input.Long)
+	newPosition, err := domain.CreatePosition(input.RideId, input.Lat, input.Long, nil)
 	if err != nil {
 		return err
 	}

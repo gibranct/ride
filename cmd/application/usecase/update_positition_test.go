@@ -100,5 +100,4 @@ func Test_UpdatePosition(t *testing.T) {
 	outputGetRide, err := getRide.Execute(outputRR.RideId)
 	assert.NoError(t, err)
 	assert.Equal(t, float64(30), outputGetRide.Distance)
-
 }
