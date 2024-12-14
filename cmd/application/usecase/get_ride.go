@@ -22,6 +22,7 @@ type GetRideOutput struct {
 	Status      string
 	Positions   []domain.Position
 	Distance    float64
+	Fare        float64
 }
 
 func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
@@ -35,7 +36,7 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 	}
 	var distance float64
 	if ride.GetStatus() == domain.COMPLETED_RIDE_STATUS {
-		distance = ride.GetDistance(positions)
+		distance = ride.GetDistance()
 	} else {
 		var newPositions []service.Position
 		for _, pos := range positions {
@@ -55,6 +56,7 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 		Status:      ride.GetStatus(),
 		Positions:   positions,
 		Distance:    distance,
+		Fare:        ride.GetFare(),
 	}, nil
 }
 

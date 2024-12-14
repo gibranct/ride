@@ -97,9 +97,10 @@ func Test_RideFinishWithOnePosition(t *testing.T) {
 
 	positions := []domain.Position{*p1}
 
-	ride.Finish(positions)
+	err = ride.Finish(positions)
+	assert.Nil(t, err)
 
-	assert.Equal(t, 0.0, ride.GetDistance(positions))
+	assert.Equal(t, 0.0, ride.GetDistance())
 	assert.Equal(t, 0.0, ride.GetFare())
 }
 
@@ -117,8 +118,9 @@ func Test_RideFinishWithEmptyPositions(t *testing.T) {
 	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
 	assert.NoError(t, err)
 
-	ride.Finish([]domain.Position{})
+	err = ride.Finish([]domain.Position{})
+	assert.Nil(t, err)
 
-	assert.Equal(t, 0.0, ride.GetDistance([]domain.Position{}))
+	assert.Equal(t, 0.0, ride.GetDistance())
 	assert.Equal(t, 0.0, ride.GetFare())
 }

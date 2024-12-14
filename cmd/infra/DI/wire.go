@@ -103,3 +103,13 @@ func NewUpdatePosition() *usecase.UpdatePosition {
 	)
 	return &usecase.UpdatePosition{}
 }
+
+func NewFinishRide() *usecase.FinishRide {
+	wire.Build(
+		usecase.NewFinishRideUseCase,
+		rideSet,
+		positionRepoSet,
+		databaseSet,
+	)
+	return &usecase.FinishRide{}
+}

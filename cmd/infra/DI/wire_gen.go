@@ -70,6 +70,14 @@ func NewUpdatePosition() *usecase.UpdatePosition {
 	return updatePosition
 }
 
+func NewFinishRide() *usecase.FinishRide {
+	postgresAdapter := database.NewPostgresAdapter()
+	rideRepositoryDatabase := repository.NewRideRepository(postgresAdapter)
+	positionRepositoryDatabase := repository.NewPositionRepository(postgresAdapter)
+	finishRide := usecase.NewFinishRideUseCase(rideRepositoryDatabase, positionRepositoryDatabase)
+	return finishRide
+}
+
 // wire.go:
 
 var databaseSet = wire.NewSet(database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))

@@ -12,8 +12,8 @@ type RideDatabaseModel struct {
 	PassengerID string         `db:"passenger_id"`
 	DriverID    sql.NullString `db:"driver_id"`
 	Status      string         `db:"status"`
-	Fare        float32        `db:"fare"`
-	Distance    float32        `db:"distance"`
+	Fare        float64        `db:"fare"`
+	Distance    float64        `db:"distance"`
 	FromLat     float64        `db:"from_lat"`
 	FromLong    float64        `db:"from_long"`
 	ToLat       float64        `db:"to_lat"`
@@ -32,5 +32,7 @@ func (e *RideDatabaseModel) ToRide() (*domain.Ride, error) {
 		e.ToLong,
 		e.Status,
 		e.Date,
+		e.Distance,
+		e.Fare,
 	)
 }

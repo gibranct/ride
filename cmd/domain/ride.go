@@ -21,7 +21,7 @@ type Ride struct {
 }
 
 func NewRide(
-	rideId, passengerId, driverId string, fromLat, fromLong, toLat, toLong float64, status string, date time.Time,
+	rideId, passengerId, driverId string, fromLat, fromLong, toLat, toLong float64, status string, date time.Time, distance, fare float64,
 ) (*Ride, error) {
 	fromCoord, err := vo.NewCoord(fromLat, fromLong)
 	if err != nil {
@@ -40,6 +40,8 @@ func NewRide(
 		from:        fromCoord,
 		to:          toCoord,
 		date:        &date,
+		distance:    distance,
+		fare:        fare,
 	}
 
 	rideStatus, err := NewRideStatus(status, ride)
@@ -58,7 +60,7 @@ func CreateRide(
 	status := "requested"
 	now := time.Now()
 	return NewRide(
-		rideId, passengerId, "", fromLat, fromLong, toLat, toLong, status, now,
+		rideId, passengerId, "", fromLat, fromLong, toLat, toLong, status, now, 0, 0,
 	)
 }
 
@@ -109,11 +111,11 @@ func (r *Ride) Start() error {
 	return nil
 }
 
-func (r *Ride) GetDistance(positions []Position) float64 {
+func (r *Ride) GetDistance() float64 {
 	return r.distance
 }
 
-func (r *Ride) Finish(positions []Position) {
+func (r *Ride) Finish(positions []Position) error {
 	r.distance = 0
 	r.fare = 0
 	for idx, pos := range positions {
@@ -125,6 +127,7 @@ func (r *Ride) Finish(positions []Position) {
 		r.distance += distance
 		r.fare += service.NewFareCalculator(*pos.Date).Calculate(distance)
 	}
+	return r.status.Finish()
 }
 
 func (r *Ride) GetFare() float64 {
