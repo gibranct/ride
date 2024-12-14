@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"fmt"
+	"time"
 
 	"github.com.br/gibranct/ride/cmd/domain"
 	"github.com.br/gibranct/ride/cmd/infra/repository"
@@ -11,6 +12,7 @@ type UpdatePositionInput struct {
 	RideId string
 	Lat    float64
 	Long   float64
+	Date   *time.Time
 }
 
 type UpdatePosition struct {
@@ -23,7 +25,7 @@ func (ar *UpdatePosition) Execute(input UpdatePositionInput) error {
 	if err != nil {
 		return fmt.Errorf("ride not found: %s", err)
 	}
-	newPosition, err := domain.CreatePosition(input.RideId, input.Lat, input.Long, nil)
+	newPosition, err := domain.CreatePosition(input.RideId, input.Lat, input.Long, input.Date)
 	if err != nil {
 		return err
 	}

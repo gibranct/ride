@@ -26,8 +26,10 @@ func Test_CreateRide(t *testing.T) {
 	toLong := 179.0
 	status := "requested"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 
 	assert.Nil(t, err)
 	assert.Equal(t, rideId, ride.GetRideId())
@@ -88,8 +90,10 @@ func Test_RideFinishWithOnePosition(t *testing.T) {
 	toLong := 0.0
 	status := "in_progress"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 	assert.NoError(t, err)
 
 	p1, err := domain.CreatePosition(rideId, 0.0, 0.0, &date)
@@ -114,8 +118,10 @@ func Test_RideFinishWithEmptyPositions(t *testing.T) {
 	toLong := 179.0
 	status := "in_progress"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 	assert.NoError(t, err)
 
 	err = ride.Finish([]domain.Position{})

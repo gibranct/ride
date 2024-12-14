@@ -20,8 +20,10 @@ func Test_RequestedRideStatus(t *testing.T) {
 	toLong := 179.0
 	status := "requested"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 	assert.NoError(t, err)
 	assert.Equal(t, status, ride.GetStatus())
 
@@ -43,8 +45,10 @@ func Test_AcceptedRideStatus(t *testing.T) {
 	toLong := 179.0
 	status := "accepted"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 	assert.NoError(t, err)
 	assert.Equal(t, status, ride.GetStatus())
 
@@ -67,8 +71,10 @@ func Test_InProgressRideStatus(t *testing.T) {
 	toLong := 179.0
 	status := "in_progress"
 	date := time.Now()
+	distance := 0.0
+	fare := 0.0
 
-	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date)
+	ride, err := domain.NewRide(rideId, passengerId, driverId, fromLat, fromLong, toLat, toLong, status, date, distance, fare)
 	assert.NoError(t, err)
 	assert.Equal(t, status, ride.GetStatus())
 
