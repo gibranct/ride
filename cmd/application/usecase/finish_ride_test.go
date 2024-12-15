@@ -67,10 +67,13 @@ func Test_FinishRideNormalHours(t *testing.T) {
 	err = startRide.Execute(inputStartRide)
 	assert.NoError(t, err)
 
+	date := time.Date(2022, 02, 15, 6, 0, 0, 0, time.UTC)
+
 	inputUpdatePosition1 := usecase.UpdatePositionInput{
 		RideId: outputRR.RideId,
 		Lat:    -27.584905257808835,
 		Long:   -48.545022195325124,
+		Date:   &date,
 	}
 	err = updatePosition.Execute(inputUpdatePosition1)
 	assert.NoError(t, err)
@@ -79,6 +82,7 @@ func Test_FinishRideNormalHours(t *testing.T) {
 		RideId: outputRR.RideId,
 		Lat:    -27.496887588317275,
 		Long:   -48.522234807851476,
+		Date:   &date,
 	}
 	err = updatePosition.Execute(inputUpdatePosition2)
 	assert.NoError(t, err)
@@ -87,6 +91,7 @@ func Test_FinishRideNormalHours(t *testing.T) {
 		RideId: outputRR.RideId,
 		Lat:    -27.584905257808835,
 		Long:   -48.545022195325124,
+		Date:   &date,
 	}
 	err = updatePosition.Execute(inputUpdatePosition3)
 	assert.NoError(t, err)
@@ -95,6 +100,7 @@ func Test_FinishRideNormalHours(t *testing.T) {
 		RideId: outputRR.RideId,
 		Lat:    -27.496887588317275,
 		Long:   -48.522234807851476,
+		Date:   &date,
 	}
 	err = updatePosition.Execute(inputUpdatePosition4)
 	assert.NoError(t, err)
