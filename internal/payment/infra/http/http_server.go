@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-const port = "127.0.0.1:3333"
+const port = "127.0.0.1:3002"
 
 type HttpServer struct {
 	app *application.Application

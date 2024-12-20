@@ -49,7 +49,7 @@ var once sync.Once
 
 func NewPostgresAdapter() *PostgresAdapter {
 	once.Do(func() {
-		db, err := sqlx.Connect("postgres", "postgres://postgres:123456@localhost:5434/app?sslmode=disable")
+		db, err := sqlx.Connect("postgres", "postgres://postgres:123456@localhost:5432/app?sslmode=disable")
 		if err != nil {
 			panic(err)
 		}

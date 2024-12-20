@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -17,21 +18,22 @@ func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 	var input usecase.SignUpInput
 
 	if err := c.Bind(&input); err != nil {
+		fmt.Printf("SignUp input: %+v\n", err)
 		c.String(http.StatusBadRequest, err.Error())
 		return err
 	}
 
+	fmt.Printf("SignUp input: %+v\n", input)
+
 	output, err := accountCtrl.accountService.SignUp.Execute(input)
+
+	fmt.Printf("SignUp output: %+v\n", output)
 
 	if err != nil {
 		response := map[string]any{"message": err.Error()}
 		log.Default().Println(response)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
-
-	response := map[string]any{"message": "Account created successfully", "accountId": output}
-
-	log.Default().Println(response)
 
 	return c.JSON(http.StatusCreated, output)
 }
