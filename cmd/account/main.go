@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com.br/gibranct/ride/cmd/application"
-	"github.com.br/gibranct/ride/cmd/infra/http"
+	"github.com.br/gibranct/ride/internal/account/application"
+	"github.com.br/gibranct/ride/internal/account/infra/http"
 )
 
 func main() {

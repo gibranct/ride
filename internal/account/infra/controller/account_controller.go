@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log"
 	"net/http"
 
 	"github.com.br/gibranct/ride/internal/account/application"
@@ -24,8 +25,13 @@ func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 
 	if err != nil {
 		response := map[string]any{"message": err.Error()}
+		log.Default().Println(response)
 		return c.JSON(http.StatusUnprocessableEntity, response)
 	}
+
+	response := map[string]any{"message": "Account created successfully", "accountId": output}
+
+	log.Default().Println(response)
 
 	return c.JSON(http.StatusCreated, output)
 }
