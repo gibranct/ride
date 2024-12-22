@@ -34,6 +34,13 @@ func (rr *RequestRide) Execute(input RequestRideInput) (*RequestRideOutput, erro
 	if !account.IsPassenger {
 		return nil, errors.New("account must be from a passenger")
 	}
+	passengerHasActiveRide, err := rr.rideRepository.HasActiveRideByPassengerId(account.ID)
+	if err != nil {
+		return nil, err
+	}
+	if passengerHasActiveRide {
+		return nil, errors.New("you already have an active ride")
+	}
 	ride, err := domain.CreateRide(input.PassengerId, input.FromLat, input.FromLong, input.ToLat, input.ToLong)
 	if err != nil {
 		return nil, err

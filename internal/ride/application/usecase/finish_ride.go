@@ -1,9 +1,11 @@
 package usecase
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com.br/gibranct/ride/internal/ride/infra/gateway"
+	"github.com.br/gibranct/ride/internal/ride/domain/event"
+	"github.com.br/gibranct/ride/internal/ride/infra/queue"
 	"github.com.br/gibranct/ride/internal/ride/infra/repository"
 )
 
@@ -14,7 +16,7 @@ type FinishRideInput struct {
 type FinishRide struct {
 	rideRepository     repository.RideRepository
 	positionRepository repository.PositionRepository
-	paymentGateway     gateway.PaymentGateway
+	queue              queue.Queue
 }
 
 func (ar *FinishRide) Execute(input FinishRideInput) error {
@@ -30,15 +32,26 @@ func (ar *FinishRide) Execute(input FinishRideInput) error {
 	if err != nil {
 		return err
 	}
-	return ar.rideRepository.UpdateRide(*ride)
+	err = ar.rideRepository.UpdateRide(*ride)
+	if err != nil {
+		return err
+	}
+	event := event.NewFinishRideEvent(ride.GetRideId(), ride.GetFare())
+	bytes, err := json.Marshal(event)
+	if err != nil {
+		return err
+	}
+	return ar.queue.Publish("rideCompleted", bytes)
 }
 
 func NewFinishRideUseCase(
 	rideRepo repository.RideRepository,
 	positionRepo repository.PositionRepository,
+	queue queue.Queue,
 ) *FinishRide {
 	return &FinishRide{
 		rideRepository:     rideRepo,
 		positionRepository: positionRepo,
+		queue:              queue,
 	}
 }

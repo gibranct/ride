@@ -95,3 +95,43 @@ func Test_RequestRideWhenAccountDoesNotExist(t *testing.T) {
 	assert.Nil(t, outputRR)
 	assert.Equal(t, err.Error(), fmt.Sprintf("account %s does not exist", accountId))
 }
+
+func Test_RequestRideWhenAlreadyHasOneActiveRide(t *testing.T) {
+	signupInput := gateway.SignUpInput{
+		Name:        "John Doe",
+		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
+		CPF:         "97456321558",
+		CarPlate:    "",
+		IsPassenger: true,
+		IsDriver:    false,
+		Password:    "secret123",
+	}
+	accountId, err := accountGateway.SignUp(signupInput)
+	if assert.NoError(t, err) {
+		assert.NotEmpty(t, accountId)
+	}
+
+	rrInput := usecase.RequestRideInput{
+		PassengerId: accountId,
+		FromLat:     -27.584905257808835,
+		FromLong:    -48.545022195325124,
+		ToLat:       -27.496887588317275,
+		ToLong:      -48.522234807851476,
+	}
+	outputRR, err := requestRide.Execute(rrInput)
+	if assert.NoError(t, err) {
+		assert.NotEmpty(t, outputRR.RideId)
+		outputGR, err := getRide.Execute(outputRR.RideId)
+		if assert.NoError(t, err) {
+			assert.Equal(t, outputRR.RideId, outputGR.RideId)
+			assert.Equal(t, rrInput.PassengerId, outputGR.PassengerId)
+			assert.Equal(t, rrInput.FromLat, outputGR.FromLat)
+			assert.Equal(t, rrInput.FromLong, outputGR.FromLong)
+			assert.Equal(t, rrInput.ToLat, outputGR.ToLat)
+			assert.Equal(t, rrInput.ToLong, outputGR.ToLong)
+		}
+	}
+
+	_, err = requestRide.Execute(rrInput)
+	assert.Error(t, err)
+}

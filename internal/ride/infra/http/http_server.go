@@ -14,7 +14,6 @@ type HttpServer struct {
 
 func (http *HttpServer) StartServer() {
 	e := echo.New()
-
 	rideCtrl := controller.NewRideController(http.app.RideService)
 
 	e.POST("/sign-up", rideCtrl.SignUpHandler)

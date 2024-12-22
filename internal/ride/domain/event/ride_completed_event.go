@@ -1,8 +1,8 @@
 package event
 
 type RideCompletedEvent struct {
-	RideId string
-	Fare   float64
+	RideId string  `json:"ride_id"`
+	Fare   float64 `json:"fare"`
 }
 
 func (r *RideCompletedEvent) GetName() string {

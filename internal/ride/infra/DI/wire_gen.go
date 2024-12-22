@@ -10,6 +10,7 @@ import (
 	"github.com.br/gibranct/ride/internal/ride/application/usecase"
 	"github.com.br/gibranct/ride/internal/ride/infra/database"
 	"github.com.br/gibranct/ride/internal/ride/infra/gateway"
+	"github.com.br/gibranct/ride/internal/ride/infra/queue"
 	"github.com.br/gibranct/ride/internal/ride/infra/repository"
 	"github.com/google/wire"
 )
@@ -59,7 +60,8 @@ func NewFinishRide() *usecase.FinishRide {
 	postgresAdapter := database.NewPostgresAdapter()
 	rideRepositoryDatabase := repository.NewRideRepository(postgresAdapter)
 	positionRepositoryDatabase := repository.NewPositionRepository(postgresAdapter)
-	finishRide := usecase.NewFinishRideUseCase(rideRepositoryDatabase, positionRepositoryDatabase)
+	queueQueue := queue.NewRabbitMQAdapter()
+	finishRide := usecase.NewFinishRideUseCase(rideRepositoryDatabase, positionRepositoryDatabase, queueQueue)
 	return finishRide
 }
 
@@ -68,8 +70,6 @@ func NewFinishRide() *usecase.FinishRide {
 var databaseSet = wire.NewSet(database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
 
 var allReposSet = wire.NewSet(gateway.NewAccountGateway, repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)), database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
-
-var accountSet = wire.NewSet(gateway.NewAccountGateway, database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))
 
 var rideSet = wire.NewSet(repository.NewRideRepository, wire.Bind(new(repository.RideRepository), new(*repository.RideRepositoryDatabase)))
 
