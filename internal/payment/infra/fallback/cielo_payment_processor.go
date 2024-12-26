@@ -1,14 +1,18 @@
 package fallback
 
-import "github.com.br/gibranct/ride/internal/payment/infra/gateway"
+import (
+	"github.com.br/gibranct/ride/internal/payment/infra/gateway"
+)
 
 type CieloPaymentProcessor struct {
 	paymentProcessor PaymentProcessor
+	cieloGateway     gateway.PaymentGateway
 }
 
-func NewCieloPaymentProcessor(next PaymentProcessor) *CieloPaymentProcessor {
+func NewCieloPaymentProcessor(next PaymentProcessor, cieloGateway gateway.PaymentGateway) *CieloPaymentProcessor {
 	return &CieloPaymentProcessor{
 		paymentProcessor: next,
+		cieloGateway:     cieloGateway,
 	}
 }
 
@@ -17,11 +21,11 @@ func (c *CieloPaymentProcessor) Next() PaymentProcessor {
 }
 
 func (c *CieloPaymentProcessor) ProcessPayment(input gateway.PaymentGatewayInput) (*gateway.PaymentGatewayOutput, error) {
-	output, err := c.paymentProcessor.ProcessPayment(input)
-	if err != nil && c.paymentProcessor.Next() == nil {
+	output, err := c.cieloGateway.CreateTransaction(input)
+	if err != nil && c.Next() == nil {
 		return nil, err
 	} else if err != nil {
-		return c.paymentProcessor.Next().ProcessPayment(input)
+		return c.Next().ProcessPayment(input)
 	}
 	return output, nil
 }
