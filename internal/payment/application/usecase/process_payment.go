@@ -33,8 +33,8 @@ func (pp *ProcessPayment) Execute(input ProcessPaymentInput) error {
 }
 
 type ProcessPaymentInput struct {
-	RideId string
-	Amount float64
+	RideId string  `json:"ride_id"`
+	Amount float64 `json:"amount"`
 }
 
 func NewProcessPaymentUseCase(
