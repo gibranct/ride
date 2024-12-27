@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com.br/gibranct/ride/internal/payment/application"
+	di "github.com.br/gibranct/ride/internal/payment/infra/DI"
 	"github.com.br/gibranct/ride/internal/payment/infra/controller"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -18,7 +18,7 @@ func Test_ProcessPaymentHandler_Returns400_WhenInputBindingFails(t *testing.T) {
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
-	paymentCtrl := controller.NewPaymentController(application.NewApplication().PaymentService)
+	paymentCtrl := controller.NewPaymentController(di.NewProcessPayment())
 
 	err := paymentCtrl.ProcessPaymentHandler(ctx)
 
@@ -34,7 +34,7 @@ func Test_ProcessPaymentHandler_Returns400_WhenInputContainsInvalidDataTypes(t *
 	req.Header.Set("Content-Type", "application/json")
 	rec := httptest.NewRecorder()
 	ctx := e.NewContext(req, rec)
-	paymentCtrl := controller.NewPaymentController(application.NewApplication().PaymentService)
+	paymentCtrl := controller.NewPaymentController(di.NewProcessPayment())
 
 	err := paymentCtrl.ProcessPaymentHandler(ctx)
 

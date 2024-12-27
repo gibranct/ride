@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com.br/gibranct/ride/internal/payment/application"
+	"github.com.br/gibranct/ride/internal/payment/application/usecase"
 	"github.com.br/gibranct/ride/internal/payment/infra/controller"
 	"github.com/labstack/echo/v4"
 )
@@ -9,21 +9,21 @@ import (
 const port = "127.0.0.1:3002"
 
 type HttpServer struct {
-	app *application.Application
+	processPayment usecase.IProcessPayment
 }
 
 func (http *HttpServer) StartServer() {
 	e := echo.New()
 
-	paymentCtrl := controller.NewPaymentController(http.app.PaymentService)
+	paymentCtrl := controller.NewPaymentController(http.processPayment)
 
 	e.POST("/process_payment", paymentCtrl.ProcessPaymentHandler)
 
 	e.Logger.Fatal(e.Start(port))
 }
 
-func NewHttpServer(app *application.Application) *HttpServer {
+func NewHttpServer(processPayment usecase.IProcessPayment) *HttpServer {
 	return &HttpServer{
-		app: app,
+		processPayment: processPayment,
 	}
 }

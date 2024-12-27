@@ -7,6 +7,10 @@ import (
 	"github.com.br/gibranct/ride/internal/payment/infra/repository"
 )
 
+type IProcessPayment interface {
+	Execute(input ProcessPaymentInput) error
+}
+
 type ProcessPayment struct {
 	paymentProcessor      fallback.PaymentProcessor
 	transactionRepository repository.TransactionRepository

@@ -1,13 +1,12 @@
 package controller
 
 import (
-	"github.com.br/gibranct/ride/internal/payment/application"
 	"github.com.br/gibranct/ride/internal/payment/application/usecase"
 	"github.com/labstack/echo/v4"
 )
 
 type PaymentController struct {
-	paymentService application.PaymentService
+	processPayment usecase.IProcessPayment
 }
 
 func (paymentCtrl *PaymentController) ProcessPaymentHandler(c echo.Context) error {
@@ -18,15 +17,15 @@ func (paymentCtrl *PaymentController) ProcessPaymentHandler(c echo.Context) erro
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(400, map[string]string{"message": err.Error()})
 	}
-	err := paymentCtrl.paymentService.ProcessPayment.Execute(input)
+	err := paymentCtrl.processPayment.Execute(input)
 	if err != nil {
 		return c.JSON(500, map[string]string{"message": err.Error()})
 	}
 	return c.String(200, "Payment processed successfully")
 }
 
-func NewPaymentController(paymentService *application.PaymentService) *PaymentController {
+func NewPaymentController(processPayment usecase.IProcessPayment) *PaymentController {
 	return &PaymentController{
-		paymentService: *paymentService,
+		processPayment: processPayment,
 	}
 }
