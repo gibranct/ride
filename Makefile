@@ -13,4 +13,4 @@ run/api/account:
 
 .PHONY: run/api/payment
 run/api/payment:
-	@export DATABASE_URL=${DATABASE_URL} && go run ./cmd/account/
+	@export DATABASE_URL=${DATABASE_URL} && go run ./cmd/payment/

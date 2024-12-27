@@ -3,6 +3,7 @@ package http
 import (
 	"github.com.br/gibranct/ride/internal/payment/application/usecase"
 	"github.com.br/gibranct/ride/internal/payment/infra/controller"
+	"github.com.br/gibranct/ride/internal/payment/infra/queue"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,6 +17,7 @@ func (http *HttpServer) StartServer() {
 	e := echo.New()
 
 	paymentCtrl := controller.NewPaymentController(http.processPayment)
+	controller.NewQueueController(http.processPayment, queue.NewRabbitMQAdapter())
 
 	e.POST("/process_payment", paymentCtrl.ProcessPaymentHandler)
 

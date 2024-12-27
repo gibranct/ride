@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"time"
+
 	domain "github.com.br/gibranct/ride/internal/ride/domain/entity"
 	"github.com.br/gibranct/ride/internal/ride/domain/service"
 	"github.com.br/gibranct/ride/internal/ride/infra/repository"
@@ -23,6 +25,7 @@ type GetRideOutput struct {
 	Positions   []domain.Position
 	Distance    float64
 	Fare        float64
+	Date        *time.Time
 }
 
 func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
@@ -57,6 +60,7 @@ func (gr *GetRide) Execute(rideId string) (*GetRideOutput, error) {
 		Positions:   positions,
 		Distance:    distance,
 		Fare:        ride.GetFare(),
+		Date:        ride.GetDate(),
 	}, nil
 }
 

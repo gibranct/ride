@@ -18,10 +18,10 @@ type AcceptRide struct {
 	accountGateway gateway.AccountGateway
 }
 
-func (ar *AcceptRide) Execute(input *AcceptRideInput) error {
+func (ar *AcceptRide) Execute(input AcceptRideInput) error {
 	account, err := ar.accountGateway.GetAccount(input.DriverId)
 	if err != nil {
-		return fmt.Errorf("account not found: %s", err)
+		return fmt.Errorf("account not found for id: %s", input.DriverId)
 	}
 	if !account.IsDriver {
 		return errors.New("account must be a driver")

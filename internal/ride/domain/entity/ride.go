@@ -133,3 +133,7 @@ func (r *Ride) Finish(positions []Position) error {
 func (r *Ride) GetFare() float64 {
 	return r.fare
 }
+
+func (r *Ride) IsFinished() bool {
+	return r.status.GetValue() == COMPLETED_RIDE_STATUS
+}

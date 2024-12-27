@@ -55,7 +55,7 @@ func Test_AcceptRide(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdDriver,
 	}
@@ -94,7 +94,7 @@ func Test_AcceptRideWhenAccountIsNotFound(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountId,
 	}
@@ -128,7 +128,7 @@ func Test_AcceptRideWhenAccountIsNotADriver(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdPassenger,
 	}

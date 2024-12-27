@@ -54,7 +54,7 @@ func Test_FinishRideNormalHours(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdDriver,
 	}
@@ -155,7 +155,7 @@ func Test_FinishRideOvernight(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdDriver,
 	}
@@ -256,7 +256,7 @@ func Test_FinishRideSpecialDay(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdDriver,
 	}

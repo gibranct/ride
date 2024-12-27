@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com.br/gibranct/ride/internal/ride/domain/event"
@@ -23,6 +24,9 @@ func (ar *FinishRide) Execute(input FinishRideInput) error {
 	ride, err := ar.rideRepository.GetRideByID(input.RideId)
 	if err != nil {
 		return fmt.Errorf("ride not found: %s", err)
+	}
+	if ride.IsFinished() {
+		return errors.New("ride is already finished")
 	}
 	positions, err := ar.positionRepository.GetPositionsByRideId(input.RideId)
 	if err != nil {

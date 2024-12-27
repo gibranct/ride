@@ -65,9 +65,10 @@ func NewRabbitMQAdapter() Queue {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	_, err = rabbit.conn.Channel()
+	rabbitChan, err := rabbit.conn.Channel()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	rabbit.channel = rabbitChan
 	return rabbit
 }

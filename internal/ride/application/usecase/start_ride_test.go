@@ -52,7 +52,7 @@ func Test_StartRide(t *testing.T) {
 	}
 	outputRR, err := requestRide.Execute(rrInput)
 	assert.NoError(t, err)
-	inputAcceptRide := &usecase.AcceptRideInput{
+	inputAcceptRide := usecase.AcceptRideInput{
 		RideId:   outputRR.RideId,
 		DriverId: accountIdDriver,
 	}

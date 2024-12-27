@@ -48,7 +48,7 @@ var instance *PostgresAdapter
 var once sync.Once
 
 func NewPostgresAdapter(dbDSN ...string) *PostgresAdapter {
-	actualDSN := "postgres://postgres:123456@localhost:5432/app?sslmode=disable"
+	actualDSN := "postgres://postgres:123456@localhost:5434/app?sslmode=disable"
 	if len(dbDSN) > 0 {
 		actualDSN = dbDSN[0]
 	}
