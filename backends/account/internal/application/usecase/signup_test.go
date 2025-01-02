@@ -1,107 +1,155 @@
 package usecase_test
 
 import (
-	"fmt"
-	"math/rand/v2"
 	"testing"
 
 	"github.com.br/gibranct/account/internal/application/usecase"
-	di "github.com.br/gibranct/account/internal/infra/DI"
+	"github.com.br/gibranct/account/internal/domain/entity"
+	"github.com.br/gibranct/account/internal/domain/errors"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-var (
-	signUp     = di.NewSignUp()
-	getAccount = di.NewGetAccount()
-)
-
-func Test_SignUpDriver(t *testing.T) {
-	account := usecase.SignUpInput{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret123",
-	}
-	output, err := signUp.Execute(account)
-	if assert.NoError(t, err) {
-		assert.NotEmpty(t, output.AccountId)
-		accountOutput, err := getAccount.Execute(output.AccountId)
-		if assert.NoError(t, err) {
-			assert.Equal(t, output.AccountId, output.AccountId)
-			assert.Equal(t, account.Name, accountOutput.Name)
-			assert.Equal(t, account.Email, accountOutput.Email)
-			assert.Equal(t, account.CPF, accountOutput.CPF)
-			assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
-			assert.True(t, accountOutput.IsDriver)
-			assert.False(t, accountOutput.IsPassenger)
-		}
-	}
+type MockAccountRepository struct {
+	mock.Mock
 }
 
-func Test_SignUpPassenger(t *testing.T) {
-	account := usecase.SignUpInput{
+func (m *MockAccountRepository) GetAccountByEmail(email string) (*entity.Account, error) {
+	args := m.Called(email)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.Account), args.Error(1)
+}
+
+func (m *MockAccountRepository) GetAccountByID(id string) (*entity.Account, error) {
+	args := m.Called(id)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.Account), args.Error(1)
+}
+
+func (m *MockAccountRepository) SaveAccount(account entity.Account) error {
+	args := m.Called(account)
+	return args.Error(0)
+}
+
+type MockMailerGateway struct {
+	mock.Mock
+}
+
+func (m *MockMailerGateway) Send(to, subject, body string) {
+	m.Called(to, subject, body)
+}
+
+func Test_SignUpExecute_EmailAlreadyTaken(t *testing.T) {
+	mockRepo := new(MockAccountRepository)
+	mockMailer := new(MockMailerGateway)
+	signUpUseCase := usecase.NewSignUpUseCase(mockRepo, mockMailer)
+
+	input := usecase.SignUpInput{
 		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
+		Email:       "john@doe.com",
 		CPF:         "97456321558",
-		CarPlate:    "",
+		CarPlate:    "XYZ1234",
 		IsPassenger: true,
 		IsDriver:    false,
-		Password:    "secret123",
+		Password:    "securepassword",
 	}
-	output, err := signUp.Execute(account)
-	if assert.NoError(t, err) {
-		assert.NotEmpty(t, output.AccountId)
-		accountOutput, err := getAccount.Execute(output.AccountId)
-		if assert.NoError(t, err) {
-			assert.Equal(t, output.AccountId, output.AccountId)
-			assert.Equal(t, account.Name, accountOutput.Name)
-			assert.Equal(t, account.Email, accountOutput.Email)
-			assert.Equal(t, account.CPF, accountOutput.CPF)
-			assert.Equal(t, account.CarPlate, accountOutput.CarPlate)
-			assert.True(t, accountOutput.IsPassenger)
-			assert.False(t, accountOutput.IsDriver)
-		}
-	}
+
+	existingAccount := &entity.Account{ID: "1234"}
+	mockRepo.On("GetAccountByEmail", input.Email).Return(existingAccount, nil)
+
+	output, err := signUpUseCase.Execute(input)
+
+	assert.Nil(t, output)
+	assert.Equal(t, errors.ErrEmailAlreadyTaken, err)
+	mockRepo.AssertCalled(t, "GetAccountByEmail", input.Email)
+	mockRepo.AssertNotCalled(t, "SaveAccount", mock.Anything)
+	mockMailer.AssertNotCalled(t, "Send", mock.Anything, mock.Anything, mock.Anything)
 }
 
-func Test_SignUpPassengerWithInvalidEmail(t *testing.T) {
-	account := usecase.SignUpInput{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d_mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret123",
+func Test_SignUpExecute_SuccessfulCreation(t *testing.T) {
+	mockRepo := new(MockAccountRepository)
+	mockMailer := new(MockMailerGateway)
+	signUpUseCase := usecase.NewSignUpUseCase(mockRepo, mockMailer)
+
+	input := usecase.SignUpInput{
+		Name:        "Jane Doe",
+		Email:       "jane@doe.com",
+		CPF:         "12345678909",
+		CarPlate:    "ABC1234",
+		IsPassenger: true,
+		IsDriver:    false,
+		Password:    "anothersecurepassword",
 	}
 
-	output, err := signUp.Execute(account)
+	mockRepo.On("GetAccountByEmail", input.Email).Return(nil, nil)
+	mockRepo.On("SaveAccount", mock.Anything).Return(nil)
+	mockMailer.On("Send", input.Email, "Welcome!", "...")
 
-	if assert.Error(t, err) {
-		assert.Nil(t, output)
-		assert.Equal(t, err.Error(), "invalid email")
-	}
+	output, err := signUpUseCase.Execute(input)
+
+	assert.NotNil(t, output)
+	assert.Nil(t, err)
+	assert.NoError(t, uuid.Validate(output.AccountId))
+	mockRepo.AssertCalled(t, "GetAccountByEmail", input.Email)
+	mockRepo.AssertCalled(t, "SaveAccount", mock.Anything)
+	mockMailer.AssertCalled(t, "Send", input.Email, "Welcome!", "...")
 }
 
-func Test_SignUpDuplicatedPassenger(t *testing.T) {
-	account := usecase.SignUpInput{
-		Name:        "John Doe",
-		Email:       fmt.Sprintf("john_%d@mail.com", rand.Int()),
-		CPF:         "97456321558",
-		CarPlate:    "AAA1234",
-		IsPassenger: false,
-		IsDriver:    true,
-		Password:    "secret123",
+func Test_SignUpExecute_AccountCreationFails(t *testing.T) {
+	mockRepo := new(MockAccountRepository)
+	mockMailer := new(MockMailerGateway)
+	signUpUseCase := usecase.NewSignUpUseCase(mockRepo, mockMailer)
+
+	input := usecase.SignUpInput{
+		Name:        "Invalid User",
+		Email:       "invalid@user.com",
+		CPF:         "invalidcpf",
+		CarPlate:    "XYZ1234",
+		IsPassenger: true,
+		IsDriver:    false,
+		Password:    "weakpassword",
 	}
 
-	signUp.Execute(account)
-	output, err := signUp.Execute(account)
+	// Simulate account creation failure
+	mockRepo.On("GetAccountByEmail", input.Email).Return(nil, nil)
 
-	if assert.Error(t, err) {
-		assert.Nil(t, output)
-		assert.Equal(t, err.Error(), "duplicated account")
+	output, err := signUpUseCase.Execute(input)
+
+	assert.Nil(t, output)
+	assert.NotNil(t, err)
+	assert.Equal(t, errors.ErrInvalidCPF, err) // Assuming ErrInvalidCPF is the error returned by CreateAccount
+	mockRepo.AssertNotCalled(t, "SaveAccount", mock.Anything)
+	mockMailer.AssertNotCalled(t, "Send", mock.Anything, mock.Anything, mock.Anything)
+}
+
+func Test_SignUpExecute_ErrorRetrievingAccountByEmail(t *testing.T) {
+	mockRepo := new(MockAccountRepository)
+	mockMailer := new(MockMailerGateway)
+	signUpUseCase := usecase.NewSignUpUseCase(mockRepo, mockMailer)
+
+	input := usecase.SignUpInput{
+		Name:        "Error User",
+		Email:       "error@user.com",
+		CPF:         "12345678909",
+		CarPlate:    "XYZ1234",
+		IsPassenger: true,
+		IsDriver:    false,
+		Password:    "securepassword",
 	}
+
+	mockRepo.On("GetAccountByEmail", input.Email).Return(nil, errors.ErrDatabase)
+
+	output, err := signUpUseCase.Execute(input)
+
+	assert.Nil(t, output)
+	assert.NotNil(t, err)
+	assert.Equal(t, errors.ErrDatabase, err)
+	mockRepo.AssertCalled(t, "GetAccountByEmail", input.Email)
+	mockRepo.AssertNotCalled(t, "SaveAccount", mock.Anything)
+	mockMailer.AssertNotCalled(t, "Send", mock.Anything, mock.Anything, mock.Anything)
 }

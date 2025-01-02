@@ -45,6 +45,7 @@ func NewErrorInfrastructure(message string) *ErrInfrastructure {
 
 var (
 	ErrSavingAccount = NewErrorInfrastructure("error saving account to database")
+	ErrDatabase      = NewErrorInfrastructure("error connecting to database")
 )
 
 func AllDomainErrors() []error {
@@ -61,6 +62,7 @@ func AllDomainErrors() []error {
 func AllInfraErrors() []error {
 	return []error{
 		ErrSavingAccount,
+		ErrDatabase,
 	}
 }
 

@@ -43,7 +43,7 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 		return nil, err
 	}
 
-	if account.ID != "" {
+	if account != nil && account.ID != "" {
 		return nil, errors.ErrEmailAlreadyTaken
 	}
 
