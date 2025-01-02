@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com.br/gibranct/account/internal/application"
 	"github.com.br/gibranct/account/internal/infra/http"
 )
@@ -8,5 +10,5 @@ import (
 func main() {
 	httpService := http.NewHttpServer(application.NewApplication())
 
-	httpService.StartServer()
+	log.Fatalln(httpService.StartServer())
 }

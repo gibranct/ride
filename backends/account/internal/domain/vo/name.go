@@ -1,8 +1,9 @@
 package vo
 
 import (
-	"errors"
 	"regexp"
+
+	"github.com.br/gibranct/account/internal/domain/errors"
 )
 
 type Name struct {
@@ -12,7 +13,7 @@ type Name struct {
 func NewName(value string) (*Name, error) {
 	matchName := regexp.MustCompile("[a-zA-Z] [a-zA-Z]+").MatchString(value)
 	if !matchName {
-		return nil, errors.New("invalid name")
+		return nil, errors.ErrInvalidName
 	}
 	return &Name{
 		value: value,

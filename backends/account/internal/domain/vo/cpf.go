@@ -1,10 +1,11 @@
 package vo
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
+
+	"github.com.br/gibranct/account/internal/domain/errors"
 )
 
 type CPF struct {
@@ -19,7 +20,7 @@ func NewCPF(value string) (*CPF, error) {
 	cpf := CPF{value: value}
 
 	if !cpf.validateCPF() {
-		return nil, errors.New("invalid cpf")
+		return nil, errors.ErrInvalidCPF
 	}
 
 	return &CPF{

@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -49,9 +50,13 @@ var once sync.Once
 
 func NewPostgresAdapter() *PostgresAdapter {
 	once.Do(func() {
-		db, err := sqlx.Connect("postgres", "postgres://postgres:123456@localhost:5433/app?sslmode=disable")
+		connString := os.Getenv("POSTGRES_DSN")
+		if connString == "" {
+			connString = "postgres://postgres:123456@localhost:5432/app?sslmode=disable"
+		}
+		db, err := sqlx.Connect("postgres", connString)
 		if err != nil {
-			panic(err)
+			log.Fatalln(err)
 		}
 		instance = &PostgresAdapter{
 			db: db,

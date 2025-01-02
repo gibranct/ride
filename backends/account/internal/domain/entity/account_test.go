@@ -1,11 +1,11 @@
-package domain_test
+package entity_test
 
 import (
 	"fmt"
 	"math/rand/v2"
 	"testing"
 
-	domain "github.com.br/gibranct/account/internal/domain/entity"
+	"github.com.br/gibranct/account/internal/domain/entity"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
@@ -19,7 +19,7 @@ func Test_CreateAccountWithoutID(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := domain.CreateAccount(
+	newAccount, err := entity.CreateAccount(
 		name,
 		email,
 		cpf,
@@ -50,7 +50,7 @@ func Test_CreateAccountWithID(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := domain.NewAccount(
+	newAccount, err := entity.NewAccount(
 		accountId,
 		name,
 		email,
@@ -80,7 +80,7 @@ func Test_CreateAccountWithInvalidName(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := domain.NewAccount(
+	newAccount, err := entity.NewAccount(
 		accountId,
 		name,
 		email,
@@ -105,7 +105,7 @@ func Test_CreateAccountWithCarPlateNilIfIsPassenger(t *testing.T) {
 	password := "password"
 	isPassenger := true
 	isDriver := false
-	newAccount, err := domain.NewAccount(
+	newAccount, err := entity.NewAccount(
 		accountId,
 		name,
 		email,

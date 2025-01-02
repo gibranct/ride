@@ -1,9 +1,9 @@
 package vo
 
 import (
-	"errors"
 	"unicode/utf8"
 
+	"github.com.br/gibranct/account/internal/domain/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -18,7 +18,7 @@ func (p *Password) Compare(hashedPassword, value string) bool {
 
 func NewPassword(value string) (*Password, error) {
 	if utf8.RuneCountInString(value) < 6 {
-		return nil, errors.New("invalid password: must be greater than 5")
+		return nil, errors.ErrPasswordTooShort
 	}
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(value), bcrypt.DefaultCost)
 	if err != nil {

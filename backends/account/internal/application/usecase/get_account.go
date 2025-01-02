@@ -1,26 +1,29 @@
 package usecase
 
-import "github.com.br/gibranct/account/internal/infra/repository"
+import (
+	"github.com.br/gibranct/account/internal/domain/errors"
+	"github.com.br/gibranct/account/internal/infra/repository"
+)
 
 type GetAccount struct {
-	accountDAO repository.AccountRepository
+	accountRepository repository.AccountRepository
 }
 
 type GetAccountOutput struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Email       string `json:"email"`
-	CPF         string `json:"cpf"`
-	CarPlate    string `json:"carPlate"`
-	IsPassenger bool   `json:"isPassenger"`
-	IsDriver    bool   `json:"isDriver"`
+	ID          string
+	Name        string
+	Email       string
+	CPF         string
+	CarPlate    string
+	IsPassenger bool
+	IsDriver    bool
 }
 
 func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
-	account, err := gc.accountDAO.GetAccountByID(accountId)
+	account, err := gc.accountRepository.GetAccountByID(accountId)
 
 	if err != nil {
-		return nil, err
+		return nil, errors.ErrAccountNotFound
 	}
 
 	return &GetAccountOutput{
@@ -34,8 +37,8 @@ func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
 	}, nil
 }
 
-func NewGetAccountUseCase(accountDAO repository.AccountRepository) *GetAccount {
+func NewGetAccountUseCase(accountRepository repository.AccountRepository) *GetAccount {
 	return &GetAccount{
-		accountDAO: accountDAO,
+		accountRepository: accountRepository,
 	}
 }

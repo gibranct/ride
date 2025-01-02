@@ -2,11 +2,10 @@ package controller
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com.br/gibranct/account/internal/application"
-	"github.com.br/gibranct/account/internal/application/usecase"
+	"github.com.br/gibranct/account/internal/infra/controller/dto"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,7 +14,7 @@ type AccountController struct {
 }
 
 func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
-	var input usecase.SignUpInput
+	var input dto.SignUpInputRequestDto
 
 	if err := c.Bind(&input); err != nil {
 		fmt.Printf("SignUp input: %+v\n", err)
@@ -23,19 +22,13 @@ func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 		return err
 	}
 
-	fmt.Printf("SignUp input: %+v\n", input)
-
-	output, err := accountCtrl.accountService.SignUp.Execute(input)
-
-	fmt.Printf("SignUp output: %+v\n", output)
+	output, err := accountCtrl.accountService.SignUp.Execute(input.ToSignUpInput())
 
 	if err != nil {
-		response := map[string]any{"message": err.Error()}
-		log.Default().Println(response)
-		return c.JSON(http.StatusUnprocessableEntity, response)
+		return writeError(err, c)
 	}
 
-	return c.JSON(http.StatusCreated, output)
+	return c.JSON(http.StatusCreated, dto.NewSignUpInputResponseDto(output.AccountId))
 }
 
 func (accountCtrl *AccountController) GetAccountByIDHandler(c echo.Context) error {
@@ -43,10 +36,10 @@ func (accountCtrl *AccountController) GetAccountByIDHandler(c echo.Context) erro
 	account, err := accountCtrl.accountService.GetAccount.Execute(accountId)
 
 	if err != nil {
-		return err
+		return writeError(err, c)
 	}
 
-	return c.JSON(http.StatusOK, account)
+	return c.JSON(http.StatusOK, dto.NewGetAccountResponseDto(account))
 }
 
 func NewAccountController(accountService *application.AccountService) *AccountController {

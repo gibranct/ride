@@ -1,8 +1,9 @@
 package vo
 
 import (
-	"errors"
 	"regexp"
+
+	"github.com.br/gibranct/account/internal/domain/errors"
 )
 
 type Email struct {
@@ -12,7 +13,7 @@ type Email struct {
 func NewEmail(value string) (*Email, error) {
 	matchEmail := regexp.MustCompile("^(.+)@(.+)$").MatchString(value)
 	if !matchEmail {
-		return nil, errors.New("invalid email")
+		return nil, errors.ErrInvalidEmail
 	}
 	return &Email{
 		value: value,

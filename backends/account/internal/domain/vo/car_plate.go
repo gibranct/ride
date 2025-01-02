@@ -1,8 +1,9 @@
 package vo
 
 import (
-	"errors"
 	"regexp"
+
+	"github.com.br/gibranct/account/internal/domain/errors"
 )
 
 type CarPlate struct {
@@ -12,7 +13,7 @@ type CarPlate struct {
 func NewCarPlate(value string) (*CarPlate, error) {
 	matchCarPlate := regexp.MustCompile("[A-Z]{3}[0-9]{4}").MatchString(value)
 	if !matchCarPlate {
-		return nil, errors.New("invalid car plate")
+		return nil, errors.ErrInvalidCarPlate
 	}
 	return &CarPlate{
 		value: value,
