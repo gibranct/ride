@@ -31,6 +31,12 @@ func NewGetAccount() *usecase.GetAccount {
 	return getAccount
 }
 
+func NewAccountPostgresRepository() *repository.AccountRepositoryDatabase {
+	postgresAdapter := database.NewPostgresAdapter()
+	accountRepositoryDatabase := repository.NewAccountRepository(postgresAdapter)
+	return accountRepositoryDatabase
+}
+
 // wire.go:
 
 var databaseSet = wire.NewSet(database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))

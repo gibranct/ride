@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"strings"
 
 	domain "github.com.br/gibranct/account/internal/domain/entity"
 	"github.com.br/gibranct/account/internal/infra/database"
@@ -23,9 +22,6 @@ func (dao AccountRepositoryDatabase) GetAccountByEmail(email string) (*domain.Ac
 	account := &model.AccountDatabaseModel{}
 	query := "select account_id, password, name, email, cpf, car_plate, is_passenger, is_driver from gct.account where email = $1"
 	err := dao.connection.QueryWithContext(context.Background(), account, query, email)
-	if err != nil && strings.Contains(err.Error(), "no rows in result set") {
-		return &domain.Account{}, nil
-	}
 	if err != nil {
 		return nil, err
 	}

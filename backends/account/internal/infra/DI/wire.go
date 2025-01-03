@@ -39,3 +39,11 @@ func NewGetAccount() *usecase.GetAccount {
 	)
 	return &usecase.GetAccount{}
 }
+
+func NewAccountPostgresRepository() *repository.AccountRepositoryDatabase {
+	wire.Build(
+		repository.NewAccountRepository,
+		databaseSet,
+	)
+	return &repository.AccountRepositoryDatabase{}
+}

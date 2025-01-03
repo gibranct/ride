@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"log"
+	"strings"
 
 	domain "github.com.br/gibranct/account/internal/domain/entity"
 	"github.com.br/gibranct/account/internal/domain/errors"
@@ -38,12 +39,10 @@ func (signUp *SignUp) Execute(input SignUpInput) (*SignUpOutput, error) {
 	}
 
 	account, err := signUp.accountDAO.GetAccountByEmail(input.Email)
-
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 		return nil, err
 	}
-
-	if account != nil && account.ID != "" {
+	if account != nil {
 		return nil, errors.ErrEmailAlreadyTaken
 	}
 

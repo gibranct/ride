@@ -3,8 +3,12 @@ package test
 import (
 	"context"
 	"log"
+	"net/http/httptest"
+	"os"
 	"time"
 
+	"github.com.br/gibranct/account/internal/application"
+	myHttp "github.com.br/gibranct/account/internal/infra/http"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -12,6 +16,24 @@ import (
 
 var scripts = []string{
 	"../../create_account.sql",
+}
+
+var testServer *httptest.Server
+
+func setup() func() {
+	dbContainer, connString := getDBConnStrAndContainer()
+	os.Setenv("POSTGRES_DSN", connString)
+
+	httpServer := myHttp.NewHttpServer(application.NewApplication())
+	httpServer.SetUpRoutes()
+
+	testServer = httptest.NewServer(httpServer.GetHandler())
+
+	return func() {
+		err := dbContainer.Terminate(context.Background())
+		log.Fatalln(err)
+		testServer.Close()
+	}
 }
 
 func getDBConnStrAndContainer() (*postgres.PostgresContainer, string) {

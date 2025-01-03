@@ -2,37 +2,29 @@ package test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"math/rand/v2"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 
-	"github.com.br/gibranct/account/internal/application"
 	"github.com.br/gibranct/account/internal/infra/controller/dto"
-	myHttp "github.com.br/gibranct/account/internal/infra/http"
+
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
-func runTestServer() (*httptest.Server, *postgres.PostgresContainer) {
-	dbContainer, connString := getDBConnStrAndContainer()
-	os.Setenv("POSTGRES_DSN", connString)
+func TestMain(m *testing.M) {
+	teardown := setup()
 
-	httpServer := myHttp.NewHttpServer(application.NewApplication())
-	httpServer.SetUpRoutes()
+	defer teardown()
 
-	return httptest.NewServer(httpServer.GetHandler()), dbContainer
+	os.Exit(m.Run())
 }
 
 func Test_SignUpAndGetAccount(t *testing.T) {
-	testServer, dbContainer := runTestServer()
-
 	fakeId := uuid.NewString()
 	testCases := []struct {
 		name                   string
@@ -55,12 +47,6 @@ func Test_SignUpAndGetAccount(t *testing.T) {
 		}},
 	}
 
-	defer t.Cleanup(func() {
-		err := dbContainer.Terminate(context.Background())
-		assert.NoError(t, err)
-		testServer.Close()
-	})
-
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
@@ -74,7 +60,7 @@ func Test_SignUpAndGetAccount(t *testing.T) {
 
 			response, err := http.DefaultClient.Do(request1)
 			assert.NoError(t, err)
-			assert.Equal(t, response.StatusCode, tc.expectedSignUpCode)
+			assert.Equal(t, tc.expectedSignUpCode, response.StatusCode)
 
 			var resp dto.SignUpInputResponseDto
 			err = json.NewDecoder(response.Body).Decode(&resp)
