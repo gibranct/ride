@@ -7,6 +7,7 @@ import (
 
 	"github.com.br/gibranct/account/internal/application"
 	"github.com.br/gibranct/account/internal/infra/controller"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -32,6 +33,9 @@ func (http *HttpServer) SetUpRoutes() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("1M"))
+	e.Use(echoprometheus.NewMiddleware("account_api_metrics"))
+
+	e.GET("/metrics", echoprometheus.NewHandler())
 
 	e.POST("/v1/sign-up", accountCtrl.SignUpHandler)
 	e.GET("/v1/accounts/:id", accountCtrl.GetAccountByIDHandler)
