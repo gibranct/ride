@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const port = "127.0.0.1:3001"
+const port = ":3001"
 
 type HttpServer struct {
 	app     *application.Application
@@ -30,12 +30,13 @@ func (http *HttpServer) SetUpRoutes() {
 
 	accountCtrl := controller.NewAccountController(http.app.AccountService)
 
+	e.Use(echoprometheus.NewMiddleware("account_api"))
+
+	e.GET("/metrics", echoprometheus.NewHandler())
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.BodyLimit("1M"))
-	e.Use(echoprometheus.NewMiddleware("account_api_metrics"))
-
-	e.GET("/metrics", echoprometheus.NewHandler())
 
 	e.POST("/v1/sign-up", accountCtrl.SignUpHandler)
 	e.GET("/v1/accounts/:id", accountCtrl.GetAccountByIDHandler)

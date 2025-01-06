@@ -52,7 +52,7 @@ func NewPostgresAdapter() *PostgresAdapter {
 	once.Do(func() {
 		connString := os.Getenv("POSTGRES_DSN")
 		if connString == "" {
-			connString = "postgres://postgres:123456@localhost:5432/app?sslmode=disable"
+			connString = "postgres://postgres:123456@localhost:5433/app?sslmode=disable"
 		}
 		db, err := sqlx.Connect("postgres", connString)
 		if err != nil {

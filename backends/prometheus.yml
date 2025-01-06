@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+  # alerting:
+  #   alertmanagers:
+  #   - static_configs:
+  #     - targets:
+  #       - alertmanager:alertmanager-01.example.com:9093
+
+  # rule_files:
+
+scrape_configs:
+- job_name: 'ride-prometheus'
+  scrape_interval: 5s
+  static_configs:
+  - targets: 
+    - localhost:9090
+
+# - job_name: cadvisor
+#   scrape_interval: 5s
+#   static_configs:
+#   - targets:
+#     - cadvisor:8080
+
+- job_name: ride-account
+  scrape_interval: 5s
+  static_configs:
+  - targets:
+    - ride_account_app:3001

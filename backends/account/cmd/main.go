@@ -10,5 +10,9 @@ import (
 func main() {
 	httpService := http.NewHttpServer(application.NewApplication())
 
-	log.Fatalln(httpService.StartServer())
+	httpService.SetUpRoutes()
+	err := httpService.StartServer()
+	if err != nil {
+		log.Fatal(err)
+	}
 }

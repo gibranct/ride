@@ -1,6 +1,13 @@
+x-default-logging: &logging
+   driver: "json-file"
+   options:
+     max-size: "5m"
+     max-file: "2"
+
 services:
   postgres_ride:
     image: postgres:14.3
+    container_name: postgres_ride
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: app
@@ -10,6 +17,7 @@ services:
       - ./create_ride.sql:/docker-entrypoint-initdb.d/init.sql
   postgres_account:
     image: postgres:14.3
+    container_name: postgres_account
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: app
@@ -19,6 +27,7 @@ services:
       - ./create_account.sql:/docker-entrypoint-initdb.d/init.sql
   postgres_payment:
     image: postgres:14.3
+    container_name: postgres_payment
     environment:
       POSTGRES_PASSWORD: 123456
       POSTGRES_DB: app
@@ -31,3 +40,38 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+
+  # apps
+  ride-account-app:
+    image: ride-account-api
+    container_name: ride_account_app
+    ports:
+      - 3001:3001
+    environment:
+      POSTGRES_DSN: "postgres://postgres:123456@postgres_account:5432/app?sslmode=disable"
+    depends_on:
+      - postgres_account
+    logging: *logging
+
+  # metrics
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    container_name: ride-prometheus
+    ports:
+      - "9090:9090"
+    command:
+     - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  # Grafana
+  grafana:
+   image: grafana/grafana:11.4.0
+   container_name: ride-grafana
+   depends_on:
+     - prometheus
+   ports:
+    - 4000:3000
+   environment:
+     - GF_SECURITY_ADMIN_PASSWORD=admin
+     - GF_USERS_ALLOW_SIGN_UP=false
