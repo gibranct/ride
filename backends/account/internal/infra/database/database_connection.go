@@ -50,11 +50,7 @@ var once sync.Once
 
 func NewPostgresAdapter() *PostgresAdapter {
 	once.Do(func() {
-		connString := os.Getenv("POSTGRES_DSN")
-		if connString == "" {
-			connString = "postgres://postgres:123456@localhost:5433/app?sslmode=disable"
-		}
-		db, err := sqlx.Connect("postgres", connString)
+		db, err := sqlx.Connect("postgres", os.Getenv("DATABASE_URL"))
 		if err != nil {
 			log.Fatalln(err)
 		}

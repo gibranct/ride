@@ -22,7 +22,7 @@ var testServer *httptest.Server
 
 func setup() func() {
 	dbContainer, connString := getDBConnStrAndContainer()
-	os.Setenv("POSTGRES_DSN", connString)
+	os.Setenv("DATABASE_URL", connString)
 
 	httpServer := myHttp.NewHttpServer(application.NewApplication())
 	httpServer.SetUpRoutes()

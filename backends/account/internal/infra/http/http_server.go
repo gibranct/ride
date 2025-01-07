@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com.br/gibranct/account/internal/application"
 	"github.com.br/gibranct/account/internal/infra/controller"
@@ -12,15 +13,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-const port = ":3001"
-
 type HttpServer struct {
 	app     *application.Application
 	handler *echo.Echo
 }
 
 func (http *HttpServer) StartServer() error {
-	return http.handler.Start(port)
+	return http.handler.Start(os.Getenv("HOST"))
 }
 
 func (http *HttpServer) SetUpRoutes() {

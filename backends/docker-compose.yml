@@ -48,7 +48,8 @@ services:
     ports:
       - 3001:3001
     environment:
-      POSTGRES_DSN: "postgres://postgres:123456@postgres_account:5432/app?sslmode=disable"
+      DATABASE_URL: "postgres://postgres:123456@postgres_account:5432/app?sslmode=disable"
+      HOST: ":3001"
     depends_on:
       - postgres_account
     logging: *logging
