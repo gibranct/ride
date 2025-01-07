@@ -1,6 +1,7 @@
 package test
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"math/rand/v2"
@@ -14,12 +15,13 @@ import (
 
 func Test_SaveAccount(t *testing.T) {
 	repo := di.NewAccountPostgresRepository()
+	ctx := context.Background()
 
 	account := getAccount()
 
-	assert.NoError(t, repo.SaveAccount(*account))
+	assert.NoError(t, repo.SaveAccount(ctx, *account))
 
-	savedAccount, err := repo.GetAccountByEmail(account.GetEmail())
+	savedAccount, err := repo.GetAccountByEmail(ctx, account.GetEmail())
 
 	if assert.NoError(t, err) {
 		assert.Equal(t, account.ID, savedAccount.ID)
@@ -31,7 +33,7 @@ func Test_SaveAccount(t *testing.T) {
 		assert.Equal(t, account.IsDriver, savedAccount.IsDriver)
 	}
 
-	savedAccount, err = repo.GetAccountByID(account.ID)
+	savedAccount, err = repo.GetAccountByID(ctx, account.ID)
 
 	if assert.NoError(t, err) {
 		assert.Equal(t, account.ID, savedAccount.ID)
@@ -46,10 +48,11 @@ func Test_SaveAccount(t *testing.T) {
 
 func Test_GetAccountByEmail_AndAccountIsNotFound(t *testing.T) {
 	repo := di.NewAccountPostgresRepository()
+	ctx := context.Background()
 
 	email := "invalid9999@mail.com"
 
-	account, err := repo.GetAccountByEmail(email)
+	account, err := repo.GetAccountByEmail(ctx, email)
 
 	assert.Nil(t, account)
 	assert.Error(t, err)
@@ -57,10 +60,11 @@ func Test_GetAccountByEmail_AndAccountIsNotFound(t *testing.T) {
 
 func Test_GetAccountByID_AndAccountIsNotFound(t *testing.T) {
 	repo := di.NewAccountPostgresRepository()
+	ctx := context.Background()
 
 	accountId := uuid.New().String()
 
-	account, err := repo.GetAccountByID(accountId)
+	account, err := repo.GetAccountByID(ctx, accountId)
 
 	assert.Nil(t, account)
 	assert.Error(t, err)

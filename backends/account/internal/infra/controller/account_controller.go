@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -22,7 +23,7 @@ func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 		return err
 	}
 
-	output, err := accountCtrl.accountService.SignUp.Execute(input.ToSignUpInput())
+	output, err := accountCtrl.accountService.SignUp.Execute(context.Background(), input.ToSignUpInput())
 
 	if err != nil {
 		return writeError(err, c)
@@ -33,7 +34,7 @@ func (accountCtrl *AccountController) SignUpHandler(c echo.Context) error {
 
 func (accountCtrl *AccountController) GetAccountByIDHandler(c echo.Context) error {
 	accountId := c.Param("id")
-	account, err := accountCtrl.accountService.GetAccount.Execute(accountId)
+	account, err := accountCtrl.accountService.GetAccount.Execute(context.Background(), accountId)
 
 	if err != nil {
 		return writeError(err, c)

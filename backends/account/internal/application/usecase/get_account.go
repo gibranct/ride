@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com.br/gibranct/account/internal/domain/errors"
 	"github.com.br/gibranct/account/internal/infra/repository"
 )
@@ -19,8 +21,8 @@ type GetAccountOutput struct {
 	IsDriver    bool
 }
 
-func (gc *GetAccount) Execute(accountId string) (*GetAccountOutput, error) {
-	account, err := gc.accountRepository.GetAccountByID(accountId)
+func (gc *GetAccount) Execute(ctx context.Context, accountId string) (*GetAccountOutput, error) {
+	account, err := gc.accountRepository.GetAccountByID(ctx, accountId)
 
 	if err != nil {
 		return nil, errors.ErrAccountNotFound
