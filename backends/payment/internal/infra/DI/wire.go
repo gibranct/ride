@@ -32,3 +32,11 @@ func NewPaymentProcessor() fallback.PaymentProcessor {
 	cieloProcessor := fallback.NewCieloPaymentProcessor(pjBankProcessor, gateway.NewPaymentGatewayCielo())
 	return cieloProcessor
 }
+
+func NewTransactionPostgresRepository() repository.TransactionRepository {
+	wire.Build(
+		repository.NewTransactionRepository,
+		databaseSet,
+	)
+	return &repository.TransactionRepositoryDatabase{}
+}

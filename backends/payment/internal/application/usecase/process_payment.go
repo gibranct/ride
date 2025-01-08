@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com.br/gibranct/payment/internal/domain"
 	"github.com.br/gibranct/payment/internal/infra/fallback"
 	"github.com.br/gibranct/payment/internal/infra/gateway"
@@ -8,7 +10,7 @@ import (
 )
 
 type IProcessPayment interface {
-	Execute(input ProcessPaymentInput) error
+	Execute(ctx context.Context, input ProcessPaymentInput) error
 }
 
 type ProcessPayment struct {
@@ -16,7 +18,7 @@ type ProcessPayment struct {
 	transactionRepository repository.TransactionRepository
 }
 
-func (pp *ProcessPayment) Execute(input ProcessPaymentInput) error {
+func (pp *ProcessPayment) Execute(ctx context.Context, input ProcessPaymentInput) error {
 	inputTransaction := gateway.PaymentGatewayInput{
 		CardHolder:       "Cliente Exemplo",
 		CreditCardNumber: "4012001037141112",
@@ -31,7 +33,7 @@ func (pp *ProcessPayment) Execute(input ProcessPaymentInput) error {
 	}
 	if output.Status == "approved" {
 		transaction.Pay()
-		return pp.transactionRepository.SaveTransaction(*transaction)
+		return pp.transactionRepository.SaveTransaction(ctx, *transaction)
 	}
 	return nil
 }

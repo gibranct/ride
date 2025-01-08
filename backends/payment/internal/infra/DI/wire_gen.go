@@ -25,6 +25,12 @@ func NewProcessPayment() *usecase.ProcessPayment {
 	return processPayment
 }
 
+func NewTransactionPostgresRepository() repository.TransactionRepository {
+	postgresAdapter := database.NewPostgresAdapter()
+	transactionRepository := repository.NewTransactionRepository(postgresAdapter)
+	return transactionRepository
+}
+
 // wire.go:
 
 var databaseSet = wire.NewSet(database.NewPostgresAdapter, wire.Bind(new(database.DatabaseConnection), new(*database.PostgresAdapter)))

@@ -1,6 +1,7 @@
 package usecase_test
 
 import (
+	"context"
 	"errors"
 	"testing"
 
@@ -32,13 +33,13 @@ type MockTransactionRepository struct {
 	mock.Mock
 }
 
-func (m *MockTransactionRepository) SaveTransaction(transaction domain.Transaction) error {
-	args := m.Called(transaction)
+func (m *MockTransactionRepository) SaveTransaction(ctx context.Context, transaction domain.Transaction) error {
+	args := m.Called(ctx, transaction)
 	return args.Error(0)
 }
 
-func (m *MockTransactionRepository) GetTransactionById(transactionId string) (*domain.Transaction, error) {
-	args := m.Called(transactionId)
+func (m *MockTransactionRepository) GetTransactionById(ctx context.Context, transactionId string) (*domain.Transaction, error) {
+	args := m.Called(ctx, transactionId)
 	if args.Get(0) == nil {
 		return nil, nil
 	}
@@ -49,6 +50,7 @@ func Test_Execute_ReturnsError_WhenPaymentProcessorFails(t *testing.T) {
 	mockProcessor := new(MockPaymentProcessor)
 	mockRepo := new(MockTransactionRepository)
 	useCase := usecase.NewProcessPaymentUseCase(mockRepo, mockProcessor)
+	ctxBackground := context.Background()
 
 	input := usecase.ProcessPaymentInput{
 		RideId: "ride123",
@@ -57,7 +59,7 @@ func Test_Execute_ReturnsError_WhenPaymentProcessorFails(t *testing.T) {
 
 	mockProcessor.On("ProcessPayment", mock.Anything).Return(nil, errors.New("processing error"))
 
-	err := useCase.Execute(input)
+	err := useCase.Execute(ctxBackground, input)
 
 	assert.NotNil(t, err)
 	assert.Equal(t, "processing error", err.Error())
@@ -69,6 +71,7 @@ func Test_Execute_SavesTransaction_WhenPaymentIsApproved(t *testing.T) {
 	mockProcessor := new(MockPaymentProcessor)
 	mockRepo := new(MockTransactionRepository)
 	useCase := usecase.NewProcessPaymentUseCase(mockRepo, mockProcessor)
+	ctxBackground := context.Background()
 
 	input := usecase.ProcessPaymentInput{
 		RideId: "ride123",
@@ -80,19 +83,20 @@ func Test_Execute_SavesTransaction_WhenPaymentIsApproved(t *testing.T) {
 	}
 
 	mockProcessor.On("ProcessPayment", mock.Anything).Return(output, nil)
-	mockRepo.On("SaveTransaction", mock.Anything).Return(nil)
+	mockRepo.On("SaveTransaction", ctxBackground, mock.Anything).Return(nil)
 
-	err := useCase.Execute(input)
+	err := useCase.Execute(ctxBackground, input)
 
 	assert.Nil(t, err)
 	mockProcessor.AssertExpectations(t)
-	mockRepo.AssertCalled(t, "SaveTransaction", mock.Anything)
+	mockRepo.AssertCalled(t, "SaveTransaction", ctxBackground, mock.Anything)
 }
 
 func Test_Execute_DoesNotSaveTransaction_WhenPaymentIsNotApproved(t *testing.T) {
 	mockProcessor := new(MockPaymentProcessor)
 	mockRepo := new(MockTransactionRepository)
 	useCase := usecase.NewProcessPaymentUseCase(mockRepo, mockProcessor)
+	ctxBackground := context.Background()
 
 	input := usecase.ProcessPaymentInput{
 		RideId: "ride123",
@@ -105,9 +109,9 @@ func Test_Execute_DoesNotSaveTransaction_WhenPaymentIsNotApproved(t *testing.T) 
 
 	mockProcessor.On("ProcessPayment", mock.Anything).Return(output, nil)
 
-	err := useCase.Execute(input)
+	err := useCase.Execute(ctxBackground, input)
 
 	assert.Nil(t, err)
 	mockProcessor.AssertExpectations(t)
-	mockRepo.AssertNotCalled(t, "SaveTransaction", mock.Anything)
+	mockRepo.AssertNotCalled(t, "SaveTransaction", ctxBackground, mock.Anything)
 }

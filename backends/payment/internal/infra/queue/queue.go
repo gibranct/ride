@@ -2,6 +2,7 @@ package queue
 
 import (
 	"log"
+	"os"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -19,7 +20,7 @@ type RabbitMQAdapter struct {
 }
 
 func (ra *RabbitMQAdapter) Connect() error {
-	amqpURI := "amqp://guest:guest@localhost:5672/"
+	amqpURI := os.Getenv("RABBITMQ_URI")
 	conn, err := amqp.Dial(amqpURI)
 	if err != nil {
 		return err
